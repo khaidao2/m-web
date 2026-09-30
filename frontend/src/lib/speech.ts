@@ -88,32 +88,60 @@ export async function listen(onText: (text: string) => void, onError: (msg: stri
   }
 }
 
-const STYLE: Record<string, { rate: number; pitch: number }> = {
-  customer: { rate: 1.05, pitch: 1.1 },
-  store_manager: { rate: 0.95, pitch: 0.85 },
-  store_staff: { rate: 1.1, pitch: 1.0 },
-  promotion: { rate: 1.0, pitch: 1.05 },
-  full_sale: { rate: 1.0, pitch: 1.1 },
+/* Persona voice. The server renders Vietnamese with Piper (same clear voice on every phone);
+   the browser's own voice is used only if it really is Vietnamese; otherwise the text on
+   screen is the fallback — never an English voice reading Vietnamese. */
+let player: HTMLAudioElement | null = null
+let playingUrl: string | null = null
+const SILENCE = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQAAAAA='
+
+/** Call from a tap (e.g. "Bắt đầu") so iOS Safari allows later audio playback. */
+export function unlockAudio() {
+  if (typeof window === 'undefined') return
+  player ??= new Audio()
+  player.src = SILENCE
+  void player.play().catch(() => {})
 }
 
-/** Speaks the persona line with a tone per character group; resolves when finished. */
-export function speak(text: string, group: string): Promise<void> {
+function vietnameseVoice(): SpeechSynthesisVoice | undefined {
+  return canSpeak() ? window.speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().replace('_', '-').startsWith('vi')) : undefined
+}
+
+function speakInBrowser(text: string): Promise<void> {
+  const voice = vietnameseVoice()
+  if (!voice) return Promise.resolve()
   return new Promise((resolve) => {
-    if (!canSpeak()) return resolve()
-    const synth = window.speechSynthesis
-    synth.cancel()
     const u = new SpeechSynthesisUtterance(text)
-    u.lang = 'vi-VN'
-    const voice = synth.getVoices().find((v) => v.lang.toLowerCase().startsWith('vi'))
-    if (voice) u.voice = voice
-    Object.assign(u, STYLE[group] ?? STYLE.customer)
-    u.onend = () => resolve()
-    u.onerror = () => resolve()
-    synth.speak(u)
-    setTimeout(resolve, Math.max(4000, text.length * 110)) // safety net: some engines never fire onend
+    u.voice = voice
+    u.lang = voice.lang
+    u.volume = 1
+    u.onend = u.onerror = () => resolve()
+    window.speechSynthesis.cancel()
+    window.speechSynthesis.speak(u)
+    setTimeout(resolve, Math.max(4000, text.length * 110)) // some engines never fire onend
   })
 }
 
+/** Speaks a persona line; resolves when playback ends (or immediately if no voice is available). */
+export async function speak(text: string, group: string, fetchAudio: (text: string, group: string) => Promise<Blob>): Promise<void> {
+  stopSpeaking()
+  try {
+    const blob = await fetchAudio(text, group)
+    player ??= new Audio()
+    if (playingUrl) URL.revokeObjectURL(playingUrl)
+    playingUrl = URL.createObjectURL(blob)
+    player.src = playingUrl
+    player.volume = 1
+    await new Promise<void>((resolve) => {
+      player!.onended = player!.onerror = player!.onpause = () => resolve()
+      player!.play().catch(() => resolve())
+    })
+  } catch {
+    await speakInBrowser(text)
+  }
+}
+
 export function stopSpeaking(): void {
+  if (player && !player.paused) player.pause()
   if (canSpeak()) window.speechSynthesis.cancel()
 }

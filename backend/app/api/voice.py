@@ -1,6 +1,8 @@
 """AI Voice Simulator 360°: roleplay sessions against the scenario bank."""
+import asyncio
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,12 +10,17 @@ from app.core.auth import current_user
 from app.core.config import get_settings
 from app.db.database import get_db
 from app.models.models import AssessmentSource, Quest, SessionKind, TurnAudio, User, UserRole, VoiceSession
-from app.services import mock_ai
+from app.services import mock_ai, tts
 from app.services.content import COMPETENCIES, level_of, scenario_public, scenarios
 from app.services.passport import QUEST_BONUS, add_points, now, record_assessments
 
 router = APIRouter(prefix="/voice")
 AUDIO_TYPES = ("audio/webm", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/wav", "audio/aac", "audio/x-m4a")
+
+
+class TTSIn(BaseModel):
+    text: str = Field(min_length=1, max_length=400)
+    group: str = "customer"
 
 
 class SessionIn(BaseModel):
@@ -34,6 +41,16 @@ async def _session(db: AsyncSession, session_id: str, user: User, lock: bool = F
     if s is None or (s.user_id != user.id and user.role is not UserRole.SUPERVISOR):
         raise HTTPException(404, "Không tìm thấy phiên luyện")
     return s
+
+
+@router.post("/tts")
+async def speak(body: TTSIn, user: User = Depends(current_user)):
+    """Persona voice in Vietnamese; the client falls back to on-screen text if this fails."""
+    try:
+        audio = await asyncio.to_thread(tts.synthesize, body.text.strip(), body.group)
+    except tts.TTSUnavailable as exc:
+        raise HTTPException(503, "Giọng đọc chưa sẵn sàng") from exc
+    return Response(audio, media_type="audio/wav", headers={"Cache-Control": "private, max-age=86400"})
 
 
 @router.get("/scenarios")

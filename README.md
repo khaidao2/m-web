@@ -12,7 +12,9 @@ Mobile-first e-learning web app for Masan Consumer PGs at Bách hoá Xanh (Chrom
 ## AI (mock)
 
 The doc's Whisper / Claude / ElevenLabs stack is mocked for the pilot:
-speech-to-text and text-to-speech use the phone browser (vi-VN), and `backend/app/services/mock_ai.py`
+speech-to-text uses the phone browser (vi-VN); the persona's voice is rendered server-side by
+[Piper](https://github.com/rhasspy/piper) with the `vi_VN-vais1000-medium` voice (trained on the VAIS-1000 corpus,
+CC BY 4.0), so every phone hears the same Vietnamese voice; and `backend/app/services/mock_ai.py`
 plays the persona from each scenario's hidden info and reactions and scores with a transparent rubric.
 Swap that module for real providers later; the API and data model stay the same.
 

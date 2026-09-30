@@ -142,3 +142,20 @@ async def test_quiz_resume_and_profile(client):
 
     me = (await client.patch("/api/v1/me", json={"store_name": "BHX Q7 - Huỳnh Tấn Phát"}, headers=PG)).json()
     assert me["store_name"] == "BHX Q7 - Huỳnh Tấn Phát" and me["stats"]["points"] == 0
+
+
+async def test_tts_endpoint(client, monkeypatch):
+    from pathlib import Path
+
+    from app.core.config import get_settings
+    from app.services import tts
+
+    assert (await client.post("/api/v1/voice/tts", json={"text": "x" * 401}, headers=PG)).status_code == 422
+    model = Path(get_settings().tts_model_path)
+    if not model.exists():  # CI: no voice model → a clean 503 the client falls back from
+        r = await client.post("/api/v1/voice/tts", json={"text": "Chào em"}, headers=PG)
+        assert r.status_code == 503
+        return
+    tts.synthesize.cache_clear()
+    r = await client.post("/api/v1/voice/tts", json={"text": "Gói này mắc hơn, em nói đáng tiền là đáng chỗ nào?", "group": "customer"}, headers=PG)
+    assert r.status_code == 200 and r.headers["content-type"] == "audio/wav" and r.content[:4] == b"RIFF"

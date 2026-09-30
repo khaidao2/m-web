@@ -5,7 +5,7 @@ import { ChevronLeft, Clock, Info, Keyboard, Mic, RotateCcw, Send, Square, Volum
 import { GROUP_META } from '@/components/icons'
 import { ErrorBox, Loading } from '@/components/ui'
 import { api } from '@/lib/api'
-import { canRecognize, listen, speak, stopSpeaking, type Listener } from '@/lib/speech'
+import { canRecognize, listen, speak, stopSpeaking, unlockAudio, type Listener } from '@/lib/speech'
 import { useApi } from '@/lib/useApi'
 import type { Scenario, Turn } from '@/lib/types'
 
@@ -49,12 +49,13 @@ function Session({ code }: { code: string }) {
   useEffect(() => () => stopSpeaking(), [])
 
   const say = useCallback(async (text: string) => {
-    await speak(text, group)
+    await speak(text, group, (t, g) => api<Blob>('/voice/tts', { method: 'POST', json: { text: t, group: g } }))
     aiDoneAt.current = Date.now()
     replyStartedAt.current = null
   }, [group])
 
   async function begin() {
+    unlockAudio()
     setBusy(true)
     setError(null)
     try {
@@ -180,7 +181,7 @@ function Session({ code }: { code: string }) {
             <li>Nói tự nhiên như tại quầy — AI chấm theo bằng chứng trong lời bạn nói.</li>
           </ul>
           <p className="tiny muted" style={{ marginTop: 10 }}>
-            Giọng trả lời được tạo tự động trên điện thoại. Bản ghi và transcript được lưu để bạn và SUP kiểm chứng; không nói dữ liệu cá nhân của khách.
+            Giọng trả lời tiếng Việt được tạo tự động (Piper · dữ liệu VAIS-1000, CC BY 4.0). Bản ghi và transcript được lưu để bạn và SUP kiểm chứng; không nói dữ liệu cá nhân của khách.
           </p>
           <label className="row small" style={{ marginTop: 12, fontWeight: 600 }}>
             <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} style={{ width: 20, height: 20, accentColor: 'var(--red)' }} />

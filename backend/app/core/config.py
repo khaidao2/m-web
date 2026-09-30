@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     keycloak_jwks_url: str = "http://localhost:8180/auth/realms/pgnexus/protocol/openid-connect/certs"
 
     max_audio_bytes: int = 3 * 1024 * 1024
+    tts_model_path: str = "/models/vi_VN-vais1000-medium.onnx"
 
 
 @lru_cache
