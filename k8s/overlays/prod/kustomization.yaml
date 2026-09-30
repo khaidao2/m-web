@@ -23,7 +23,7 @@ patches:
 images:
 - name: pgnexus-backend
   newName: ghcr.io/khaidao2/m-web-backend
-  newTag: 996c0d3166409d4976d1f39cd203d5a2e4a066d7
+  newTag: 28782aa2c67314c7e142723fad584648c39b984e
 - name: pgnexus-frontend
   newName: ghcr.io/khaidao2/m-web-frontend
-  newTag: 996c0d3166409d4976d1f39cd203d5a2e4a066d7
+  newTag: 28782aa2c67314c7e142723fad584648c39b984e
