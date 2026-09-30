@@ -51,7 +51,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - run: kubectl kustomize k8s/overlays/prod > /dev/null
+      - name: render prod overlay
+        run: |
+          kubectl kustomize k8s/overlays/prod > rendered.yaml
+          # every generated ConfigMap must be referenced by its hashed name
+          if grep -nE "name: (pgnexus-config|keycloak-realm|postgres-init)$" rendered.yaml; then
+            echo "::error::unhashed ConfigMap reference in rendered manifests"; exit 1
+          fi
 
   images:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

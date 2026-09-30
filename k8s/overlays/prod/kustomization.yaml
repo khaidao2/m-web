@@ -2,6 +2,8 @@
 # CI updates the image tags below on every push to main.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+# must match the base namespace so generated ConfigMap names are rewritten in references
+namespace: pgnexus
 resources:
 - ../../base
 configMapGenerator:
