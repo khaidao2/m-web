@@ -3,6 +3,7 @@
 # Re-running is safe: an existing secret is left untouched.
 set -euo pipefail
 NS=${NS:-pgnexus}
+echo "cluster: $(kubectl config current-context) ($(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'))"
 kubectl get namespace "$NS" >/dev/null 2>&1 || kubectl create namespace "$NS"
 if kubectl -n "$NS" get secret pgnexus-secrets >/dev/null 2>&1; then
   echo "secret $NS/pgnexus-secrets already exists — leaving it unchanged"

@@ -1,7 +1,8 @@
 .PHONY: dev api-dev web-dev test lint secrets argocd status logs
 
-KUBECONFIG ?= $(HOME)/.kube/k3s-fedora.yaml
-export KUBECONFIG
+# Always target the k3s cluster, even if the shell exports another KUBECONFIG
+K3S_KUBECONFIG ?= $(HOME)/.kube/k3s-fedora.yaml
+KUBECTL := KUBECONFIG=$(K3S_KUBECONFIG) kubectl
 PY ?= python3
 
 ## Local: Postgres + Keycloak + API in Docker, Next.js dev server on :3000 (same-origin proxy)
@@ -22,14 +23,14 @@ lint:
 
 ## Cluster (k3s: fedora control plane + fedora-1 worker)
 secrets:
-	./scripts/bootstrap-secrets.sh
+	KUBECONFIG=$(K3S_KUBECONFIG) ./scripts/bootstrap-secrets.sh
 
 argocd:
-	kubectl apply -f deploy/argocd/masan-lms.yaml
+	$(KUBECTL) apply -f deploy/argocd/masan-lms.yaml
 
 status:
-	kubectl -n pgnexus get pods,ingress
-	kubectl -n argocd get application masan-lms
+	$(KUBECTL) -n pgnexus get pods,ingress
+	$(KUBECTL) -n argocd get application masan-lms
 
 logs:
-	kubectl -n pgnexus logs deploy/backend -f
+	$(KUBECTL) -n pgnexus logs deploy/backend -f
