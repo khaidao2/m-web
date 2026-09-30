@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { MasanMark, Wordmark } from './Brand'
 import { BookOpen, ClipboardCheck, Gauge, House, IdCard, Mic, Trophy, type LucideIcon } from 'lucide-react'
 
 type NavItem = { href: string; label: string; icon: LucideIcon; center?: boolean }
@@ -24,6 +25,10 @@ export default function BottomNav({ role }: { role: 'pg' | 'supervisor' }) {
   const home = items[0].href
   return (
     <nav className="bottom-nav" aria-label="Điều hướng chính" style={{ gridTemplateColumns: `repeat(${items.length}, 1fr)` }}>
+      <div className="nav-brand">
+        <Wordmark />
+        <MasanMark />
+      </div>
       {items.map(({ href, label, icon: Icon, center }) => {
         const active = href === home ? path === home : path.startsWith(href)
         return (

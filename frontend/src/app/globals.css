@@ -211,3 +211,60 @@ body:has(.live-session) .bottom-nav { display: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* ───────────────── Desktop web (phones keep the layout above) ───────────────── */
+.nav-brand { display: none; }
+
+@media (min-width: 900px) {
+  :root { --side: 248px; }
+  .app { max-width: none; box-shadow: none; padding-left: var(--side); }
+  .page, .page.bare { max-width: 1120px; margin: 0 auto; padding: 24px 40px 56px; }
+  .page.focused { max-width: 760px; }
+  .topbar { padding: 14px 40px; }
+  /* the sidebar carries the brand, so the top bar keeps only the actions */
+  .app > .topbar > .wordmark, .app > .topbar .row > img { display: none !important; }
+  .app > .topbar { justify-content: flex-end; }
+
+  /* bottom tab bar → left sidebar */
+  .bottom-nav {
+    top: 0; bottom: 0; left: 0; transform: none; width: var(--side); max-width: none; height: 100dvh;
+    display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 20px 14px;
+    border-top: 0; border-right: 1px solid var(--line); background: var(--card);
+  }
+  .nav-brand { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px 22px; }
+  .bottom-nav a {
+    height: 46px; flex-direction: row; justify-content: flex-start; gap: 12px; padding: 0 14px;
+    border-radius: 12px; font-size: 14.5px; font-weight: 600; color: var(--ink-2);
+  }
+  .bottom-nav a:hover { background: var(--bg); }
+  .bottom-nav a.active { background: var(--red-soft); color: var(--red-deep); }
+  .bottom-nav a.center > span {
+    width: 30px; height: 30px; margin: 0 -4px 0 -6px; border-radius: 9px; box-shadow: none;
+  }
+  .bottom-nav a.center > span svg { width: 17px; height: 17px; }
+
+  /* live roleplay: no sidebar, a focused centered column */
+  body:has(.live-session) .app { padding-left: 0; }
+  .live-session { max-width: 760px !important; }
+
+  /* content flows into columns */
+  .grid2 { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+  .h1 { font-size: 30px; }
+  .page > .item + .item { margin-top: 10px; }
+
+  /* login: hero left, form right */
+  .app.landing {
+    padding-left: 0; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(420px, 1fr);
+    grid-template-rows: auto 1fr; min-height: 100dvh;
+  }
+  .app.landing > .topbar { grid-column: 2; padding: 22px 48px; justify-content: space-between; }
+  .app.landing > .topbar > .wordmark, .app.landing > .topbar > img { display: inline !important; }
+  .app.landing > .landing-hero { grid-column: 1; grid-row: 1 / span 2; height: auto !important; min-height: 100dvh; }
+  .app.landing > .landing-hero h1 { font-size: 52px !important; }
+  .app.landing > .landing-hero > div { left: 56px !important; bottom: 56px !important; }
+  .app.landing > .landing-form { grid-column: 2; max-width: 520px; width: 100%; padding: 12px 48px 48px; margin: 0; }
+}
+
+@media (min-width: 1280px) {
+  .page:not(.focused) .grid2 { grid-template-columns: repeat(3, 1fr); }
+}

@@ -141,7 +141,7 @@ export default function QuizGame({ params }: { params: Promise<{ id: string }> }
   const ss = String(Math.floor(totalLeft % 60)).padStart(2, '0')
 
   return (
-    <main className="page bare" style={{ paddingTop: 4 }}>
+    <main className="page bare focused" style={{ paddingTop: 4 }}>
       <div className="row between small" style={{ fontWeight: 700 }}>
         <span>Câu {index + 1}/{attempt.questions.length}</span>
         <span className="chip" style={{ color: totalLeft < 30 ? 'var(--red)' : undefined }}><Clock size={13} /> {mm}:{ss}</span>
@@ -235,7 +235,7 @@ function ResultView({ attempt, result, me }: { attempt: Attempt; result: Result;
   }
 
   return (
-    <main className="page bare">
+    <main className="page bare focused">
       <section className="card pop" style={{ textAlign: 'center', padding: 24 }}>
         <div className="eyebrow">Kết quả thử thách 180 giây</div>
         <div style={{ fontSize: 56, fontWeight: 800, color: tone, marginTop: 8, lineHeight: 1 }}>{result.percent}%</div>

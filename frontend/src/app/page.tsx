@@ -46,12 +46,12 @@ export default function Landing() {
   }
 
   return (
-    <main className="app" style={{ background: 'var(--card)' }}>
+    <main className="app landing" style={{ background: 'var(--card)' }}>
       <div className="topbar" style={{ background: 'var(--card)' }}>
         <Wordmark />
         <MasanMark />
       </div>
-      <section style={{ position: 'relative', height: 180, overflow: 'hidden', color: '#fff' }}>
+      <section className="landing-hero" style={{ position: 'relative', height: 180, overflow: 'hidden', color: '#fff' }}>
         <HeroArt />
         <div style={{ position: 'absolute', left: 20, right: 20, bottom: 18 }}>
           <div className="eyebrow" style={{ color: '#ffd7d9' }}>Masan Consumer • BHX HCM</div>
@@ -61,7 +61,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="page bare" style={{ paddingTop: 22 }}>
+      <section className="page bare landing-form" style={{ paddingTop: 22 }}>
         <div className="eyebrow">Chào mừng bạn trở lại</div>
         <h2 className="h2" style={{ marginTop: 8 }}>Sẵn sàng cho một ca bán hàng tốt hơn?</h2>
         <ul className="stack" style={{ listStyle: 'none', margin: '14px 0 20px' }}>
