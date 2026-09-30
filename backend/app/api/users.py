@@ -1,112 +1,60 @@
-import uuid
-from datetime import datetime, timezone
-from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel, Field
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from pydantic import BaseModel
 
+from app.core.auth import current_user
 from app.db.database import get_db
-from app.models.models import User, PGPassport, UserRole
-from app.core.auth import verify_token, get_current_user_info
+from app.models.models import FlagStatus, PointsEntry, QuizAttempt, RedFlag, SessionKind, User, VoiceSession
+from app.services.content import scenarios
 
 router = APIRouter()
 
 
-class UserUpdate(BaseModel):
-    full_name: Optional[str] = None
-    phone: Optional[str] = None
-    store_code: Optional[str] = None
-    region: Optional[str] = None
+def onboarding_scenario(user: User) -> str:
+    """The 7-minute entry roleplay: a full 5-step sale (BH group), fixed per PG."""
+    codes = sorted(c for c, s in scenarios().items() if s["group"] == "full_sale")
+    return codes[sum(map(ord, user.id)) % len(codes)]
 
 
-async def get_or_create_user(db: AsyncSession, user_info: dict) -> User:
-    """Get or create user from Keycloak token claims."""
-    keycloak_id = user_info["keycloak_id"]
-    result = await db.execute(select(User).where(User.keycloak_id == keycloak_id))
-    user = result.scalar_one_or_none()
-
-    if not user:
-        # Try by email first
-        result = await db.execute(select(User).where(User.email == user_info["email"]))
-        user = result.scalar_one_or_none()
-
-        if user:
-            user.keycloak_id = keycloak_id
-        else:
-            # Create new user
-            role_str = user_info.get("role", "pg")
-            try:
-                role = UserRole(role_str)
-            except ValueError:
-                role = UserRole.PG
-
-            user = User(
-                id=str(uuid.uuid4()),
-                keycloak_id=keycloak_id,
-                email=user_info["email"],
-                full_name=user_info.get("full_name", ""),
-                role=role,
-            )
-            db.add(user)
-
-        # Create empty passport for PG users
-        if user.role == UserRole.PG:
-            result = await db.execute(select(PGPassport).where(PGPassport.user_id == user.id))
-            if not result.scalar_one_or_none():
-                passport = PGPassport(id=str(uuid.uuid4()), user_id=user.id)
-                db.add(passport)
-
-        await db.commit()
-        await db.refresh(user)
-
-    return user
-
-
-@router.get("/me")
-async def get_me(
-    payload: dict = Depends(verify_token),
-    db: AsyncSession = Depends(get_db),
-):
-    user_info = await get_current_user_info(payload)
-    user = await get_or_create_user(db, user_info)
+async def onboarding_status(db: AsyncSession, user: User) -> dict:
+    quiz_done = await db.scalar(select(QuizAttempt.id).where(
+        QuizAttempt.user_id == user.id, QuizAttempt.completed_at.is_not(None)).limit(1))
+    voice_done = await db.scalar(select(VoiceSession.id).where(
+        VoiceSession.user_id == user.id, VoiceSession.kind == SessionKind.ONBOARDING,
+        VoiceSession.completed_at.is_not(None)).limit(1))
     return {
-        "id": user.id,
-        "email": user.email,
-        "full_name": user.full_name,
-        "phone": user.phone,
-        "role": user.role,
-        "store_code": user.store_code,
-        "region": user.region,
-        "is_active": user.is_active,
-        "created_at": user.created_at,
+        "quiz_done": quiz_done is not None,
+        "voice_done": voice_done is not None,
+        "voice_scenario": onboarding_scenario(user),
+        "complete": quiz_done is not None and voice_done is not None,
     }
 
 
-@router.put("/me")
-async def update_me(
-    data: UserUpdate,
-    payload: dict = Depends(verify_token),
-    db: AsyncSession = Depends(get_db),
-):
-    user_info = await get_current_user_info(payload)
-    user = await get_or_create_user(db, user_info)
+class ProfileIn(BaseModel):
+    store_name: str = Field(min_length=2, max_length=200)
 
-    if data.full_name is not None:
-        user.full_name = data.full_name
-    if data.phone is not None:
-        user.phone = data.phone
-    if data.store_code is not None:
-        user.store_code = data.store_code
-    if data.region is not None:
-        user.region = data.region
 
-    await db.commit()
-    await db.refresh(user)
-    return {"message": "Cập nhật thành công", "user": {
+@router.patch("/me")
+async def update_me(body: ProfileIn, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    user.store_name = body.store_name.strip()
+    return await me(user, db)
+
+
+@router.get("/me")
+async def me(user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    points, days = (await db.execute(
+        select(func.coalesce(func.sum(PointsEntry.points), 0), func.count(func.distinct(func.date(PointsEntry.created_at))))
+        .where(PointsEntry.user_id == user.id)
+    )).one()
+    open_flags = await db.scalar(select(func.count(RedFlag.id)).where(
+        RedFlag.user_id == user.id, RedFlag.status != FlagStatus.CLOSED))
+    return {
+        "stats": {"points": int(points), "days_learned": days, "open_flags": open_flags},
         "id": user.id,
-        "email": user.email,
+        "username": user.username,
         "full_name": user.full_name,
-        "store_code": user.store_code,
-        "region": user.region,
-    }}
+        "role": user.role.value,
+        "store_name": user.store_name,
+        "onboarding": await onboarding_status(db, user),
+    }

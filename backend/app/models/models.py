@@ -1,205 +1,175 @@
+"""PG-NEXUS persistence model.
+
+Competency scores are 0–10 (doc §IV). A missing score means "Chưa đánh giá", never 0.
 """
-PG-NEXUS Database Models
-Entities: User, PGPassport, Quiz, QuizAttempt, VoiceSession, Competency, Leaderboard
-"""
-import uuid
 import enum
-from datetime import datetime
-from typing import Optional
+import uuid
+from datetime import date, datetime
+
 from sqlalchemy import (
-    String, Integer, Float, Boolean, DateTime, Text, JSON,
-    ForeignKey, Enum as SAEnum, Index
+    JSON, BigInteger, Date, DateTime, Enum, Float, ForeignKey, Index, Integer, LargeBinary, String, Text, func,
 )
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.sql import func
+from sqlalchemy.orm import Mapped, mapped_column
+
 from app.db.database import Base
 
 
-def gen_uuid() -> str:
+def _id() -> str:
     return str(uuid.uuid4())
 
 
 class UserRole(str, enum.Enum):
     PG = "pg"
     SUPERVISOR = "supervisor"
-    ADMIN = "admin"
 
 
-class CompetencyLevel(int, enum.Enum):
-    LEVEL_1 = 1  # Cần cải thiện
-    LEVEL_2 = 2  # Trung bình - Đạt yêu cầu
-    LEVEL_3 = 3  # Khá - Thành thạo
-    LEVEL_4 = 4  # Giỏi - Xuất sắc
+class AssessmentSource(str, enum.Enum):
+    QUIZ = "quiz"
+    VOICE = "voice"
+    SUP = "sup"
 
 
-class SessionStatus(str, enum.Enum):
-    PENDING = "pending"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
-    FAILED = "failed"
+class SessionKind(str, enum.Enum):
+    ONBOARDING = "onboarding"
+    QUEST = "quest"
+    PRACTICE = "practice"
+
+
+class FlagStatus(str, enum.Enum):
+    OPEN = "open"          # score < 5.0
+    READY = "ready"        # AI score reached 7.0, waiting for SUP stamp
+    CLOSED = "closed"      # SUP stamped
+
+
+def _enum(e: type[enum.Enum]) -> Enum:
+    return Enum(e, values_callable=lambda x: [m.value for m in x], native_enum=False, length=20)
 
 
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=gen_uuid)
-    keycloak_id: Mapped[Optional[str]] = mapped_column(String(36), unique=True, index=True)
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    full_name: Mapped[str] = mapped_column(String(255))
-    phone: Mapped[Optional[str]] = mapped_column(String(20))
-    role: Mapped[UserRole] = mapped_column(SAEnum(UserRole), default=UserRole.PG)
-    store_code: Mapped[Optional[str]] = mapped_column(String(50))  # BHX store code
-    region: Mapped[Optional[str]] = mapped_column(String(100))
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
-
-    # Relationships
-    passport: Mapped[Optional["PGPassport"]] = relationship("PGPassport", back_populates="user", uselist=False)
-    quiz_attempts: Mapped[list["QuizAttempt"]] = relationship("QuizAttempt", back_populates="user")
-    voice_sessions: Mapped[list["VoiceSession"]] = relationship("VoiceSession", back_populates="user")
-
-
-class PGPassport(Base):
-    """Digital Passport - tracks PG competency levels (7 competencies)"""
-    __tablename__ = "pg_passports"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=gen_uuid)
-    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), unique=True, index=True)
-
-    # 7 Competencies scores (1.0-4.0 scale)
-    c1_approach: Mapped[float] = mapped_column(Float, default=0.0)       # Tiếp cận & Thiết lập kết nối
-    c2_discovery: Mapped[float] = mapped_column(Float, default=0.0)      # Thấu hiểu & Khơi gợi nhu cầu
-    c3_storytelling: Mapped[float] = mapped_column(Float, default=0.0)   # Tư vấn giải pháp sản phẩm
-    c4_expansion: Mapped[float] = mapped_column(Float, default=0.0)      # Gia tăng giá trị giỏ hàng
-    c5_objection: Mapped[float] = mapped_column(Float, default=0.0)      # Xử lý phản bác & Củng cố niềm tin
-    c6_negotiation: Mapped[float] = mapped_column(Float, default=0.0)    # Đàm phán & Thuyết phục
-    c7_discipline: Mapped[float] = mapped_column(Float, default=0.0)     # Thái độ & Kỷ luật
-
-    # Computed
-    overall_score: Mapped[float] = mapped_column(Float, default=0.0)
-    total_points: Mapped[int] = mapped_column(Integer, default=0)  # gamification points
-    red_flags: Mapped[list] = mapped_column(JSON, default=list)    # list of competency keys with score < 2.0
-
-    # Status
-    is_initialized: Mapped[bool] = mapped_column(Boolean, default=False)
-    last_assessment_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
-
-    user: Mapped["User"] = relationship("User", back_populates="passport")
-
-
-class Quiz(Base):
-    """3-minute quiz bank"""
-    __tablename__ = "quizzes"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=gen_uuid)
-    title: Mapped[str] = mapped_column(String(255))
-    description: Mapped[Optional[str]] = mapped_column(Text)
-    category: Mapped[str] = mapped_column(String(100))  # product_knowledge, process, promotion
-    competency_target: Mapped[Optional[str]] = mapped_column(String(10))  # c1-c7
-    questions: Mapped[list] = mapped_column(JSON)  # list of {id, text, image_url, options, correct, explanation}
-    time_limit_seconds: Mapped[int] = mapped_column(Integer, default=180)  # 3 minutes
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    keycloak_sub: Mapped[str | None] = mapped_column(String(64), unique=True)
+    username: Mapped[str] = mapped_column(String(100))
+    full_name: Mapped[str] = mapped_column(String(200))
+    role: Mapped[UserRole] = mapped_column(_enum(UserRole), default=UserRole.PG)
+    store_name: Mapped[str | None] = mapped_column(String(200))
+    is_demo: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    attempts: Mapped[list["QuizAttempt"]] = relationship("QuizAttempt", back_populates="quiz")
+
+class Assessment(Base):
+    """One scored observation of one competency; the passport is derived from these."""
+    __tablename__ = "assessments"
+    __table_args__ = (Index("ix_assessments_user_comp", "user_id", "competency", "created_at"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    competency: Mapped[str] = mapped_column(String(4))
+    score: Mapped[float] = mapped_column(Float)
+    source: Mapped[AssessmentSource] = mapped_column(_enum(AssessmentSource))
+    ref_id: Mapped[str | None] = mapped_column(String(36))
+    created_by: Mapped[str | None] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class RedFlag(Base):
+    __tablename__ = "red_flags"
+    __table_args__ = (Index("ix_red_flags_user_status", "user_id", "status"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    competency: Mapped[str] = mapped_column(String(4))
+    status: Mapped[FlagStatus] = mapped_column(_enum(FlagStatus), default=FlagStatus.OPEN)
+    opened_score: Mapped[float] = mapped_column(Float)
+    opened_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    ready_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    closed_by: Mapped[str | None] = mapped_column(ForeignKey("users.id"))
+    sup_score: Mapped[float | None] = mapped_column(Float)
+    sup_note: Mapped[str | None] = mapped_column(Text)
 
 
 class QuizAttempt(Base):
     __tablename__ = "quiz_attempts"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=gen_uuid)
-    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), index=True)
-    quiz_id: Mapped[str] = mapped_column(String(36), ForeignKey("quizzes.id"), index=True)
-
-    score: Mapped[float] = mapped_column(Float, default=0.0)  # percentage 0-100
-    points_earned: Mapped[int] = mapped_column(Integer, default=0)
-    answers: Mapped[list] = mapped_column(JSON, default=list)  # list of {question_id, selected, correct, time_ms}
-    time_taken_seconds: Mapped[int] = mapped_column(Integer, default=0)
-    status: Mapped[SessionStatus] = mapped_column(SAEnum(SessionStatus), default=SessionStatus.PENDING)
-
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    question_ids: Mapped[list] = mapped_column(JSON)
+    answers: Mapped[list] = mapped_column(JSON, default=list)
+    correct: Mapped[int] = mapped_column(Integer, default=0)
+    by_category: Mapped[dict] = mapped_column(JSON, default=dict)
+    points: Mapped[int] = mapped_column(Integer, default=0)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
-
-    user: Mapped["User"] = relationship("User", back_populates="quiz_attempts")
-    quiz: Mapped["Quiz"] = relationship("Quiz", back_populates="attempts")
-
-
-class VoiceScenario(Base):
-    """AI Voice Simulation scenarios"""
-    __tablename__ = "voice_scenarios"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=gen_uuid)
-    title: Mapped[str] = mapped_column(String(255))
-    description: Mapped[Text] = mapped_column(Text)
-    scenario_type: Mapped[str] = mapped_column(String(50))  # customer_objection, store_manager, etc.
-    persona_prompt: Mapped[str] = mapped_column(Text)  # Claude system prompt for the AI persona
-    target_competencies: Mapped[list] = mapped_column(JSON, default=list)  # ["c1","c5"]
-    difficulty: Mapped[int] = mapped_column(Integer, default=1)  # 1-5
-    duration_minutes: Mapped[int] = mapped_column(Integer, default=7)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-
-    sessions: Mapped[list["VoiceSession"]] = relationship("VoiceSession", back_populates="scenario")
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class VoiceSession(Base):
-    """AI Voice simulation session"""
     __tablename__ = "voice_sessions"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=gen_uuid)
-    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), index=True)
-    scenario_id: Mapped[str] = mapped_column(String(36), ForeignKey("voice_scenarios.id"), index=True)
-
-    # Session state
-    status: Mapped[SessionStatus] = mapped_column(SAEnum(SessionStatus), default=SessionStatus.PENDING)
-    conversation_history: Mapped[list] = mapped_column(JSON, default=list)  # [{role, content, timestamp, audio_url}]
-
-    # Scoring
-    scores: Mapped[dict] = mapped_column(JSON, default=dict)  # {c1: 2.5, c2: 3.0, ...}
-    overall_score: Mapped[float] = mapped_column(Float, default=0.0)
-    points_earned: Mapped[int] = mapped_column(Integer, default=0)
-
-    # Metrics
-    total_latency_ms: Mapped[int] = mapped_column(Integer, default=0)
-    avg_response_latency_ms: Mapped[float] = mapped_column(Float, default=0.0)
-    keyword_hits: Mapped[list] = mapped_column(JSON, default=list)
-    feedback_summary: Mapped[Optional[str]] = mapped_column(Text)
-
-    # Recording
-    recording_url: Mapped[Optional[str]] = mapped_column(String(500))
-
-    # Supervisor review
-    supervisor_stamp: Mapped[bool] = mapped_column(Boolean, default=False)
-    supervisor_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("users.id"))
-    supervisor_notes: Mapped[Optional[str]] = mapped_column(Text)
-    stamped_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
-
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    scenario_code: Mapped[str] = mapped_column(String(10))
+    kind: Mapped[SessionKind] = mapped_column(_enum(SessionKind))
+    quest_id: Mapped[str | None] = mapped_column(String(36))
+    turns: Mapped[list] = mapped_column(JSON, default=list)
+    revealed: Mapped[list] = mapped_column(JSON, default=list)
+    scores: Mapped[dict] = mapped_column(JSON, default=dict)
+    overall: Mapped[float | None] = mapped_column(Float)
+    report: Mapped[dict] = mapped_column(JSON, default=dict)
+    points: Mapped[int] = mapped_column(Integer, default=0)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
-
-    user: Mapped["User"] = relationship("User", back_populates="voice_sessions", foreign_keys=[user_id])
-    scenario: Mapped["VoiceScenario"] = relationship("VoiceScenario", back_populates="sessions")
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
-class DailyQuest(Base):
-    """Personalized micro-learning assignment targeting red flags"""
-    __tablename__ = "daily_quests"
+class TurnAudio(Base):
+    """PG's recorded voice for one turn, kept so the SUP can listen back (Workstream 3)."""
+    __tablename__ = "turn_audio"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=gen_uuid)
-    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), index=True)
-    title: Mapped[str] = mapped_column(String(255))
-    description: Mapped[str] = mapped_column(Text)
-    target_competency: Mapped[str] = mapped_column(String(10))  # c1-c7
-    task_type: Mapped[str] = mapped_column(String(50))  # quiz | voice_session
-    task_id: Mapped[str] = mapped_column(String(36))  # quiz_id or scenario_id
-    is_completed: Mapped[bool] = mapped_column(Boolean, default=False)
-    assigned_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    due_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
-    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    session_id: Mapped[str] = mapped_column(ForeignKey("voice_sessions.id", ondelete="CASCADE"), primary_key=True)
+    turn_index: Mapped[int] = mapped_column(Integer, primary_key=True)
+    mime: Mapped[str] = mapped_column(String(60))
+    data: Mapped[bytes] = mapped_column(LargeBinary)
 
-    __table_args__ = (
-        Index("ix_daily_quests_user_date", "user_id", "assigned_date"),
-    )
+
+class Quest(Base):
+    __tablename__ = "quests"
+    __table_args__ = (Index("ix_quests_user_day", "user_id", "day"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    day: Mapped[date] = mapped_column(Date)
+    scenario_code: Mapped[str] = mapped_column(String(10))
+    red_flag_id: Mapped[str | None] = mapped_column(ForeignKey("red_flags.id", ondelete="SET NULL"))
+    competency: Mapped[str | None] = mapped_column(String(4))
+    session_id: Mapped[str | None] = mapped_column(String(36))
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class PointsEntry(Base):
+    __tablename__ = "points_ledger"
+    __table_args__ = (Index("ix_points_user_time", "user_id", "created_at"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    points: Mapped[int] = mapped_column(Integer)
+    reason: Mapped[str] = mapped_column(String(40))
+    ref_id: Mapped[str | None] = mapped_column(String(36))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class FieldAudit(Base):
+    """Numbers the Sales Sup enters per PG (Workstream 1 · Field Audit Sync)."""
+    __tablename__ = "field_audits"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    sup_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
+    period: Mapped[date] = mapped_column(Date)
+    revenue_vnd: Mapped[int | None] = mapped_column(BigInteger)
+    dday_units: Mapped[int | None] = mapped_column(Integer)
+    activations: Mapped[int | None] = mapped_column(Integer)
+    extra_displays: Mapped[int | None] = mapped_column(Integer)
+    c7_score: Mapped[float | None] = mapped_column(Float)
+    note: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

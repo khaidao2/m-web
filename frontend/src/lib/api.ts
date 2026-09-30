@@ -1,60 +1,34 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+'use client'
+import { accessToken } from './auth'
 
-export async function apiFetch(path: string, options?: RequestInit, token?: string) {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-  if (token) headers['Authorization'] = `Bearer ${token}`
-  const res = await fetch(`${API_BASE}/api/v1${path}`, {
-    ...options,
-    headers: { ...headers, ...(options?.headers as Record<string, string> || {}) },
-  })
-  if (!res.ok) throw new Error(await res.text())
-  return res.json()
+export class ApiError extends Error {
+  constructor(public status: number, message: string) {
+    super(message)
+  }
 }
 
-export const api = {
-  me: (token: string) => apiFetch('/users/me', {}, token),
-  passport: (token: string) => apiFetch('/passport', {}, token),
-  leaderboard: (token: string) => apiFetch('/leaderboard', {}, token),
-  myRank: (token: string) => apiFetch('/leaderboard/me', {}, token),
-  quizzes: (token: string) => apiFetch('/quizzes', {}, token),
-  quiz: (id: string, token: string) => apiFetch(`/quizzes/${id}`, {}, token),
-  startQuiz: (id: string, token: string) =>
-    apiFetch(`/quizzes/${id}/start`, { method: 'POST' }, token),
-  submitQuiz: (attemptId: string, answers: unknown[], token: string) =>
-    apiFetch(`/quizzes/attempts/${attemptId}/submit`, {
-      method: 'POST',
-      body: JSON.stringify({ answers }),
-    }, token),
-  scenarios: (token: string) => apiFetch('/voice/scenarios', {}, token),
-  createSession: (scenarioId: string, token: string) =>
-    apiFetch('/voice/sessions', {
-      method: 'POST',
-      body: JSON.stringify({ scenario_id: scenarioId }),
-    }, token),
-  transcribe: (sessionId: string, audioBlob: Blob, token: string) => {
-    const fd = new FormData()
-    fd.append('audio', audioBlob, 'audio.webm')
-    return fetch(`${API_BASE}/api/v1/voice/sessions/${sessionId}/transcribe`, {
-      method: 'POST',
-      body: fd,
-      headers: { Authorization: `Bearer ${token}` },
-    }).then(r => r.json())
-  },
-  chat: (sessionId: string, transcript: string, token: string) =>
-    apiFetch(`/voice/sessions/${sessionId}/chat`, {
-      method: 'POST',
-      body: JSON.stringify({ transcript }),
-    }, token),
-  tts: (sessionId: string, text: string, token: string) =>
-    fetch(`${API_BASE}/api/v1/voice/sessions/${sessionId}/tts`, {
-      method: 'POST',
-      body: JSON.stringify({ text }),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    }),
-  completeSession: (sessionId: string, token: string) =>
-    apiFetch(`/voice/sessions/${sessionId}/complete`, { method: 'POST' }, token),
-  quests: (token: string) => apiFetch('/quests/today', {}, token),
+export async function api<T>(path: string, init: RequestInit & { json?: unknown } = {}): Promise<T> {
+  const token = await accessToken()
+  if (!token) {
+    window.location.replace('/')
+    throw new ApiError(401, 'Phiên đăng nhập đã hết hạn')
+  }
+  const headers = new Headers(init.headers)
+  headers.set('Authorization', `Bearer ${token}`)
+  let body = init.body
+  if (init.json !== undefined) {
+    headers.set('Content-Type', 'application/json')
+    body = JSON.stringify(init.json)
+  }
+  const res = await fetch(`/api/v1${path}`, { ...init, headers, body })
+  if (!res.ok) {
+    let detail = `Lỗi ${res.status}`
+    try {
+      const data = await res.json()
+      if (typeof data.detail === 'string') detail = data.detail
+    } catch {}
+    throw new ApiError(res.status, detail)
+  }
+  const type = res.headers.get('content-type') || ''
+  return (type.includes('application/json') ? res.json() : res.blob()) as Promise<T>
 }

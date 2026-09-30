@@ -1,0 +1,24 @@
+# Bootstrap once: kubectl apply -f deploy/argocd/masan-lms.yaml
+# Argo CD then keeps k8s/overlays/prod on main in sync (CI bumps image tags there).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: masan-lms
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/khaidao2/m-web.git
+    targetRevision: main
+    path: k8s/overlays/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: pgnexus
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [CreateNamespace=true]
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: pgnexus-secrets
+      jsonPointers: [/data]

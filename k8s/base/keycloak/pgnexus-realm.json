@@ -1,0 +1,134 @@
+{
+  "realm": "pgnexus",
+  "enabled": true,
+  "displayName": "PG NEXUS · Masan Consumer",
+  "internationalizationEnabled": true,
+  "supportedLocales": [
+    "vi",
+    "en"
+  ],
+  "defaultLocale": "vi",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "rememberMe": true,
+  "loginWithEmailAllowed": false,
+  "bruteForceProtected": true,
+  "failureFactor": 8,
+  "sslRequired": "external",
+  "accessTokenLifespan": 900,
+  "ssoSessionIdleTimeout": 604800,
+  "ssoSessionMaxLifespan": 2592000,
+  "requiredActions": [
+    {
+      "alias": "VERIFY_PROFILE",
+      "name": "Verify Profile",
+      "providerId": "VERIFY_PROFILE",
+      "enabled": false,
+      "defaultAction": false,
+      "priority": 90,
+      "config": {}
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "pg",
+        "description": "PG Masan Consumer tại BHX"
+      },
+      {
+        "name": "supervisor",
+        "description": "Sales Supervisor"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "pgnexus-web",
+      "name": "PG NEXUS web",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "implicitFlowEnabled": false,
+      "rootUrl": "${APP_URL}",
+      "baseUrl": "/",
+      "redirectUris": [],
+      "webOrigins": [
+        "${APP_URL}"
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "+"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "pg01",
+      "enabled": true,
+      "firstName": "Lan",
+      "lastName": "Nguyễn Thị",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_PG_PASSWORD}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "pg"
+      ]
+    },
+    {
+      "username": "pg02",
+      "enabled": true,
+      "firstName": "Hương",
+      "lastName": "Trần Thu",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_PG_PASSWORD}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "pg"
+      ]
+    },
+    {
+      "username": "pg03",
+      "enabled": true,
+      "firstName": "Vy",
+      "lastName": "Lê Tường",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_PG_PASSWORD}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "pg"
+      ]
+    },
+    {
+      "username": "sup01",
+      "enabled": true,
+      "firstName": "Minh",
+      "lastName": "Phạm Quang",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_SUP_PASSWORD}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "supervisor"
+      ]
+    }
+  ]
+}

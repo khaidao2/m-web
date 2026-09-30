@@ -1,69 +1,46 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: backend
-  namespace: pgnexus
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: backend
-  template:
-    metadata:
-      labels:
-        app: backend
-    spec:
-      initContainers:
-      - name: db-migrate
-        image: pgnexus/backend:latest
-        imagePullPolicy: IfNotPresent
-        command: ["alembic", "upgrade", "head"]
-        envFrom:
-        - secretRef:
-            name: backend-secret
-      containers:
-      - name: backend
-        image: pgnexus/backend:latest
-        imagePullPolicy: IfNotPresent
-        envFrom:
-        - secretRef:
-            name: backend-secret
-        ports:
-        - containerPort: 8000
-        readinessProbe:
-          httpGet:
-            path: /api/v1/health
-            port: 8000
-          initialDelaySeconds: 10
-          periodSeconds: 10
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
----
 apiVersion: v1
 kind: Service
 metadata:
   name: backend
-  namespace: pgnexus
 spec:
-  selector:
-    app: backend
-  ports:
-    - port: 8000
-      targetPort: 8000
+  selector: { app: backend }
+  ports: [{ port: 8000, targetPort: 8000 }]
 ---
-apiVersion: v1
-kind: Secret
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: backend-secret
-  namespace: pgnexus
-type: Opaque
-stringData:
-  DATABASE_URL: postgresql+asyncpg://pgnexus:pgnexus_pass@postgres:5432/pgnexus
-  REDIS_URL: redis://redis:6379/0
-  KEYCLOAK_URL: http://keycloak:8080
-  KEYCLOAK_REALM: pgnexus
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: backend }
+  template:
+    metadata:
+      labels: { app: backend }
+    spec:
+      initContainers:
+        - name: migrate
+          image: pgnexus-backend
+          command: ["sh", "-c", "alembic upgrade head && python -m scripts.seed"]
+          env: &env
+            - name: POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: pgnexus-secrets, key: POSTGRES_PASSWORD } }
+            - { name: DATABASE_URL, value: "postgresql+asyncpg://pgnexus:$(POSTGRES_PASSWORD)@postgres:5432/pgnexus" }
+            - { name: KEYCLOAK_JWKS_URL, value: "http://keycloak:8080/auth/realms/pgnexus/protocol/openid-connect/certs" }
+            - { name: KEYCLOAK_ISSUER, valueFrom: { configMapKeyRef: { name: pgnexus-config, key: KEYCLOAK_ISSUER } } }
+      containers:
+        - name: backend
+          image: pgnexus-backend
+          env: *env
+          ports: [{ containerPort: 8000 }]
+          readinessProbe:
+            httpGet: { path: /api/v1/health, port: 8000 }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /api/v1/health, port: 8000 }
+            initialDelaySeconds: 20
+            periodSeconds: 30
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          securityContext: { allowPrivilegeEscalation: false, runAsNonRoot: true }

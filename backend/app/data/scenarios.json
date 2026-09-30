@@ -1,0 +1,1687 @@
+[
+ {
+  "code": "KH01",
+  "title": "So giá mỗi gói nhưng khác khối lượng",
+  "group": "customer",
+  "group_label": "Khách hàng khó tính",
+  "difficulty": 2,
+  "competencies": [
+   "c2",
+   "c3",
+   "c5"
+  ],
+  "context": "Khách cầm hai gói mì, chỉ vào giá bán và nghi ngờ PG cố bán loại đắt hơn.",
+  "pg_data": "Dữ liệu luyện giả định: SP-A 80g giá 10.000đ; SP-B 65g giá 8.000đ; không cấp dữ liệu hương vị/thành phần. Giá/100g lần lượt 12.500đ và khoảng 12.308đ: A không rẻ hơn trên 100g.",
+  "opening": "Gói này mắc hơn, em nói đáng tiền là đáng chỗ nào?",
+  "hidden": [
+   {
+    "trigger": "ưu tiên",
+    "reveal": "khách muốn no trong bữa trưa, không nhất thiết rẻ nhất mỗi gói."
+   },
+   {
+    "trigger": "mức chi",
+    "reveal": "tối đa 12.000đ cho một gói."
+   }
+  ],
+  "good_reaction": "Khi PG hỏi nhu cầu rồi tính giá theo khối lượng đúng, khách hỏi tiếp: Vậy khẩu vị nào hợp chị, có thông tin gì trên gói không?",
+  "poor_reaction": "Nếu PG chỉ nói thương hiệu tốt hơn: Ai bán hàng chẳng nói đồ mình tốt, em so cụ thể giúp chị đi.",
+  "behaviors": [
+   "Hỏi tiêu chí ngoài giá.",
+   "Tính đúng giá trên 100g và không đồng nhất giá/khối lượng với chất lượng.",
+   "Đề xuất trong ngân sách và hỏi khách có phù hợp không."
+  ],
+  "critical_error": "Tự khẳng định sản phẩm tốt cho sức khỏe hoặc hạ thấp đối thủ khi không có căn cứ."
+ },
+ {
+  "code": "KH02",
+  "title": "Mặn trong lần dùng trước",
+  "group": "customer",
+  "group_label": "Khách hàng khó tính",
+  "difficulty": 2,
+  "competencies": [
+   "c2",
+   "c3",
+   "c5"
+  ],
+  "context": "Khách trả chai nước mắm lại kệ vì lần trước dùng để nêm món kho thấy quá mặn.",
+  "pg_data": "Không cung cấp hàm lượng muối hoặc hướng dẫn định lượng; phải tra nhãn đã duyệt mới tư vấn cụ thể.",
+  "opening": "Loại này mặn lắm, lần trước chị nấu cả nhà ăn không nổi.",
+  "hidden": [
+   {
+    "trigger": "cách dùng",
+    "reveal": "khách thay loại cũ bằng cùng số muỗng, không xem hướng dẫn."
+   },
+   {
+    "trigger": "mong đợi",
+    "reveal": "muốn điều chỉnh vị dễ, không yêu cầu tư vấn bệnh lý."
+   }
+  ],
+  "good_reaction": "Khi PG ghi nhận trải nghiệm và xin kiểm tra nhãn/cách dùng, khách đồng ý xem hướng dẫn trước khi quyết định.",
+  "poor_reaction": "Nếu PG nói do chị nấu sai: Em đang bảo chị không biết nấu ăn hả?",
+  "behaviors": [
+   "Hỏi món ăn và cách dùng trước đây.",
+   "Ghi nhận trải nghiệm mà không phủ nhận.",
+   "Đề nghị kiểm tra hướng dẫn đúng mã sản phẩm, không tự bịa liều dùng."
+  ],
+  "critical_error": "Đổ lỗi cho khách hoặc khẳng định sản phẩm ít muối/phù hợp bệnh lý khi chưa có tài liệu."
+ },
+ {
+  "code": "KH03",
+  "title": "Ngại đổi nhãn hàng quen",
+  "group": "customer",
+  "group_label": "Khách hàng khó tính",
+  "difficulty": 1,
+  "competencies": [
+   "c2",
+   "c3",
+   "c5"
+  ],
+  "context": "Khách luôn mua một nhãn nước mắm cũ và từ chối nghe giới thiệu.",
+  "pg_data": "Không xác nhận chai nhỏ có hàng; PG phải đề nghị kiểm tra.",
+  "opening": "Nhà chị ăn loại kia mấy năm rồi, đổi làm gì cho mất công?",
+  "hidden": [
+   {
+    "trigger": "điều thích ở loại cũ",
+    "reveal": "gia đình quen mùi và vị khi chấm."
+   },
+   {
+    "trigger": "khả năng thử",
+    "reveal": "khách có thể cân nhắc chai nhỏ nếu có tại cửa hàng, không muốn đổi toàn bộ."
+   }
+  ],
+  "good_reaction": "Nếu PG tôn trọng thói quen và gợi ý thử ở mức nhỏ có kiểm tra tồn, khách hỏi: Có chai nhỏ thật không em?",
+  "poor_reaction": "Nếu PG công kích nhãn cũ: Chị vẫn thấy nhà chị dùng tốt, em khỏi tư vấn nữa.",
+  "behaviors": [
+   "Tìm lý do trung thành.",
+   "Không ép đổi ngay.",
+   "Đề xuất trải nghiệm có điều kiện và tôn trọng từ chối."
+  ],
+  "critical_error": "Nói xấu nhãn khác hoặc bảo đảm chắc chắn cả nhà sẽ thích."
+ },
+ {
+  "code": "KH04",
+  "title": "Khách nghĩ PG chỉ muốn bán cho đủ chỉ tiêu",
+  "group": "customer",
+  "group_label": "Khách hàng khó tính",
+  "difficulty": 3,
+  "competencies": [
+   "c1",
+   "c2",
+   "c5"
+  ],
+  "context": "Khách né PG và tỏ ra mất niềm tin sau một lần được tư vấn mua nhiều hơn nhu cầu.",
+  "pg_data": "Không có ưu đãi combo trong tình huống; mục tiêu thành công có thể là khách cảm thấy được tôn trọng, chưa mua ngay.",
+  "opening": "Em tư vấn vì chị cần hay vì em cần chạy số?",
+  "hidden": [
+   {
+    "trigger": "trải nghiệm",
+    "reveal": "lần trước khách mua combo nhưng bỏ thừa."
+   },
+   {
+    "trigger": "nhu cầu hiện tại",
+    "reveal": "chỉ cần một sản phẩm dùng trong tuần."
+   }
+  ],
+  "good_reaction": "Khi PG thừa nhận quyền tự chọn và tư vấn đúng một món, khách mở lòng nói món ăn định nấu.",
+  "poor_reaction": "Nếu PG tiếp tục đẩy combo: Chị vừa nói lần trước mua dư rồi mà.",
+  "behaviors": [
+   "Ghi nhận lý do thiếu tin tưởng.",
+   "Xin phép hỗ trợ thay vì bám đuổi.",
+   "Giữ đề xuất đúng nhu cầu một món."
+  ],
+  "critical_error": "Dùng áp lực, khiến khách áy náy hoặc tiếp tục bán thêm sau khi khách từ chối rõ."
+ },
+ {
+  "code": "KH05",
+  "title": "Lo ngại từ tin đồn trên mạng",
+  "group": "customer",
+  "group_label": "Khách hàng khó tính",
+  "difficulty": 3,
+  "competencies": [
+   "c2",
+   "c3",
+   "c5"
+  ],
+  "context": "Khách đưa một bài đăng không rõ nguồn về phụ gia trong gia vị và yêu cầu PG xác nhận.",
+  "pg_data": "Không cung cấp kết luận y khoa hoặc giấy chứng nhận; AI không tự tạo nội dung bài đăng thành sự thật.",
+  "opening": "Người ta nói chất này không tốt, em có dám bảo đảm an toàn không?",
+  "hidden": [
+   {
+    "trigger": "sản phẩm/bài đăng",
+    "reveal": "khách chưa đối chiếu đúng mã."
+   },
+   {
+    "trigger": "mối lo",
+    "reveal": "sợ mua nhầm cho cả gia đình, không có chẩn đoán sức khỏe được cung cấp."
+   }
+  ],
+  "good_reaction": "Nếu PG không hứa tuyệt đối và đề nghị kiểm tra đúng nhãn/nguồn chính thức, khách đồng ý cùng đối chiếu.",
+  "poor_reaction": "Nếu PG gạt đi là tin nhảm: Em chưa đọc mà sao biết không đúng?",
+  "behaviors": [
+   "Xác định đúng mã sản phẩm và nội dung khách lo.",
+   "Phân biệt thông tin đã xác minh với chưa biết.",
+   "Chỉ dẫn nguồn xác thực và để khách tự quyết."
+  ],
+  "critical_error": "Đưa bảo đảm sức khỏe tuyệt đối, chẩn đoán hoặc bịa chứng nhận."
+ },
+ {
+  "code": "KH06",
+  "title": "Cho rằng vị hoặc mùi đã thay đổi",
+  "group": "customer",
+  "group_label": "Khách hàng khó tính",
+  "difficulty": 2,
+  "competencies": [
+   "c2",
+   "c3",
+   "c5"
+  ],
+  "context": "Khách kể gói cà phê vừa mua có vị khác lần trước và không muốn mua nữa.",
+  "pg_data": "Chưa có dữ liệu công thức hoặc lô; không được tự kết luận chất lượng.",
+  "opening": "Cùng một nhãn mà lần này uống khác hẳn, bên em đổi chất lượng à?",
+  "hidden": [
+   {
+    "trigger": "mã/bao bì",
+    "reveal": "khách chưa chắc là cùng biến thể."
+   },
+   {
+    "trigger": "xử lý mong muốn",
+    "reveal": "muốn biết mình có chọn nhầm và ai hỗ trợ phản ánh."
+   }
+  ],
+  "good_reaction": "Khi PG hỏi mã, thời điểm mua và cách đối chiếu, khách nói có ảnh bao bì ở điện thoại.",
+  "poor_reaction": "Nếu PG nói công thức chắc chắn không đổi: Em có kiểm tra đâu mà khẳng định?",
+  "behaviors": [
+   "Không phủ nhận trải nghiệm.",
+   "Xin thông tin cần thiết để xác định đúng mã sản phẩm.",
+   "Đề nghị chuyển phản ánh đúng đầu mối, không hứa đổi trả ngoài quyền hạn."
+  ],
+  "critical_error": "Khẳng định công thức không đổi hoặc sản phẩm lỗi khi chưa xác minh."
+ },
+ {
+  "code": "KH07",
+  "title": "Hạn dùng còn ngắn so với tốc độ sử dụng",
+  "group": "customer",
+  "group_label": "Khách hàng khó tính",
+  "difficulty": 2,
+  "competencies": [
+   "c2",
+   "c3",
+   "c5"
+  ],
+  "context": "Khách thấy sản phẩm còn hai tháng đến hạn nhưng dự định dùng trong ba tháng.",
+  "pg_data": "Hai tháng còn hạn và ba tháng dự kiến dùng là dữ liệu giả định; không đồng nghĩa sản phẩm hiện tại hỏng.",
+  "opening": "Chị mua về dùng từ từ, hạn có hai tháng thì sao dùng kịp?",
+  "hidden": [
+   {
+    "trigger": "tần suất dùng",
+    "reveal": "khách chỉ dùng cuối tuần."
+   },
+   {
+    "trigger": "lựa chọn khác",
+    "reveal": "khách sẵn sàng tìm lô có hạn dài hơn hoặc gói nhỏ hơn."
+   }
+  ],
+  "good_reaction": "Khi PG đề nghị kiểm tra lô khác và không ép lấy, khách đồng ý chờ kiểm tra ngắn.",
+  "poor_reaction": "Nếu PG bảo quá hạn chút vẫn dùng được: Vậy ai chịu trách nhiệm cho chị?",
+  "behaviors": [
+   "Hỏi mức tiêu thụ dự kiến.",
+   "Đối chiếu hạn và hướng dẫn bảo quản đúng nhãn.",
+   "Đưa lựa chọn khác hoặc chấp nhận chưa bán."
+  ],
+  "critical_error": "Khuyên dùng quá hạn hoặc che hạn sử dụng."
+ },
+ {
+  "code": "KH08",
+  "title": "Khách vội không muốn nghe dài",
+  "group": "customer",
+  "group_label": "Khách hàng khó tính",
+  "difficulty": 2,
+  "competencies": [
+   "c1",
+   "c2",
+   "c5"
+  ],
+  "context": "Khách cầm giỏ, nhìn đồng hồ và nói chỉ còn một phút trước khi đi đón con.",
+  "pg_data": "Áp lực thời gian là đặc điểm nhân vật, không dùng tốc độ nói nhanh làm tiêu chuẩn chấm điểm.",
+  "opening": "Chị đang vội, em đừng giới thiệu dài nha.",
+  "hidden": [
+   {
+    "trigger": "một câu ưu tiên",
+    "reveal": "khách tìm gia vị cho món kho, muốn đúng loại đang dùng."
+   },
+   {
+    "trigger": "có cần so sánh",
+    "reveal": "khách không muốn đổi nhãn hôm nay."
+   }
+  ],
+  "good_reaction": "Khi PG hỏi ngắn và giúp xác định đúng món cần, khách cảm ơn và đi thanh toán.",
+  "poor_reaction": "Nếu PG đọc dài ưu điểm: Thôi chị tự tìm, không kịp nữa.",
+  "behaviors": [
+   "Xin phép hỗ trợ ngắn.",
+   "Hỏi đúng thông tin tối thiểu.",
+   "Kết thúc đúng lúc, không ép bán chéo."
+  ],
+  "critical_error": "Chặn đường, giữ giỏ hoặc phớt lờ việc khách muốn kết thúc."
+ },
+ {
+  "code": "KH09",
+  "title": "Muốn thử sản phẩm nhưng không có hàng dùng thử",
+  "group": "customer",
+  "group_label": "Khách hàng khó tính",
+  "difficulty": 1,
+  "competencies": [
+   "c3",
+   "c5"
+  ],
+  "context": "Khách chưa biết vị tương ớt và đòi mở một chai bán lẻ để nếm.",
+  "pg_data": "Không có hoạt động sampling được duyệt trong tình huống; không xác nhận có gói nhỏ.",
+  "opening": "Không cho thử sao chị biết có hợp, em mở chai này đi.",
+  "hidden": [
+   {
+    "trigger": "khẩu vị",
+    "reveal": "khách ăn cay nhẹ."
+   },
+   {
+    "trigger": "phương án",
+    "reveal": "khách chấp nhận xem thông tin nhãn hoặc chưa mua hôm nay."
+   }
+  ],
+  "good_reaction": "Nếu PG giải thích giới hạn và đề nghị xem mô tả đã duyệt, khách hỏi có gói nhỏ hoặc đợt dùng thử chính thức không.",
+  "poor_reaction": "Nếu PG gợi ý tự mở rồi để lại kệ: Mở rồi ai mua chai đó?",
+  "behaviors": [
+   "Nêu giới hạn lịch sự.",
+   "Khai thác khẩu vị.",
+   "Kiểm tra lựa chọn được phép mà không bịa lịch dùng thử."
+  ],
+  "critical_error": "Tự ý mở hàng bán lẻ hoặc tổ chức dùng thử chưa được phép."
+ },
+ {
+  "code": "KH10",
+  "title": "Đòi PG bảo đảm hoàn tiền nếu không ngon",
+  "group": "customer",
+  "group_label": "Khách hàng khó tính",
+  "difficulty": 3,
+  "competencies": [
+   "c3",
+   "c5"
+  ],
+  "context": "Khách chỉ đồng ý thử nhãn mì mới nếu PG hứa nhận lại bất kể đã ăn hết.",
+  "pg_data": "Không cung cấp chính sách đổi trả; AI không tự tạo điều kiện áp dụng.",
+  "opening": "Ăn không ngon chị mang ra, em trả tiền cho chị nha?",
+  "hidden": [
+   {
+    "trigger": "lo ngại",
+    "reveal": "khách sợ mất tiền vì cả nhà kén vị."
+   },
+   {
+    "trigger": "mức thử",
+    "reveal": "có thể mua một gói nếu hiểu rõ mình không được hứa đổi vì khẩu vị."
+   }
+  ],
+  "good_reaction": "Nếu PG nói rõ không có quyền cam kết và đề nghị kiểm tra chính sách cửa hàng, khách cân nhắc một gói.",
+  "poor_reaction": "Nếu PG hứa miệng: Em ghi tên em đây, chị sẽ quay lại tìm em.",
+  "behaviors": [
+   "Ghi nhận rủi ro khách cảm nhận.",
+   "Không hứa vượt thẩm quyền.",
+   "Gợi ý thử nhỏ hoặc chưa mua, kiểm tra chính sách nếu khách yêu cầu."
+  ],
+  "critical_error": "Tự cam kết hoàn tiền hoặc dùng tiền cá nhân để bảo đảm thay chính sách."
+ },
+ {
+  "code": "CHT01",
+  "title": "Giữ 6 mâm trong khi cửa hàng muốn còn 5",
+  "group": "store_manager",
+  "group_label": "Cửa hàng trưởng",
+  "difficulty": 2,
+  "competencies": [
+   "c5",
+   "c6"
+  ],
+  "context": "CHT muốn thu hẹp khu mì/gia vị vì cần chỗ cho ngành hàng khác. PG có số liệu bán của hai tuần.",
+  "pg_data": "Giả định: 6 mâm; tuần trước 100 đơn vị, tuần gần nhất 120; chưa có doanh số của khu dự định thay thế. Tăng 20% không đủ để kết luận hiệu quả/mâm hơn ngành khác.",
+  "opening": "Tuần tới anh giảm khu em còn 5 mâm, mình chốt vậy nha.",
+  "hidden": [
+   {
+    "trigger": "lý do",
+    "reveal": "nhóm khác thiếu vị trí cuối tuần."
+   },
+   {
+    "trigger": "tiêu chí giữ",
+    "reveal": "CHT muốn chứng minh hiệu quả trên diện tích, không chỉ tổng bán."
+   }
+  ],
+  "good_reaction": "Nếu PG đề xuất thử 7 ngày và cùng theo dõi doanh số/mâm, CHT hỏi ai theo dõi và mốc báo cáo.",
+  "poor_reaction": "Nếu PG chỉ nói công ty lớn nên phải giữ: Anh cần hiệu quả cửa hàng, không phải tên thương hiệu.",
+  "behaviors": [
+   "Hỏi ràng buộc diện tích.",
+   "Tính/diễn giải đúng số liệu và thừa nhận thiếu dữ liệu đối chứng.",
+   "Đề xuất thử có mốc rà soát và phương án nếu không đạt."
+  ],
+  "critical_error": "Hứa chắc doanh số hoặc dùng dữ liệu không có nguồn trong tình huống."
+ },
+ {
+  "code": "CHT02",
+  "title": "Phải tháo ụ vì cản lối đi",
+  "group": "store_manager",
+  "group_label": "Cửa hàng trưởng",
+  "difficulty": 2,
+  "competencies": [
+   "c5",
+   "c6"
+  ],
+  "context": "CHT yêu cầu tháo ụ trưng bày đang làm hẹp lối khách đẩy xe.",
+  "pg_data": "Không có kích thước lối đi chuẩn trong tình huống; không bịa tiêu chuẩn pháp lý hoặc quyền theo hợp đồng.",
+  "opening": "Ụ này vướng lối rồi, hôm nay phải dẹp.",
+  "hidden": [
+   {
+    "trigger": "điểm vướng",
+    "reveal": "xe hàng và xe khách khó tránh nhau."
+   },
+   {
+    "trigger": "vị trí khác",
+    "reveal": "có góc cuối kệ có thể xem xét nhưng chưa được duyệt."
+   }
+  ],
+  "good_reaction": "Nếu PG ưu tiên lối đi rồi xin cùng xem vị trí thay thế, CHT đồng ý đi kiểm tra.",
+  "poor_reaction": "Nếu PG chỉ viện lý do đã trả phí trưng bày: Có phí cũng không thể chắn đường khách.",
+  "behaviors": [
+   "Thừa nhận yêu cầu an toàn/lưu thông.",
+   "Tìm hiểu phương án thay thế.",
+   "Chốt ai phê duyệt và ai thực hiện."
+  ],
+  "critical_error": "Cố giữ vị trí gây cản trở hoặc tự dời sang khu chưa được phép."
+ },
+ {
+  "code": "CHT03",
+  "title": "Xin vị trí phụ thử nghiệm cho sản phẩm mới",
+  "group": "store_manager",
+  "group_label": "Cửa hàng trưởng",
+  "difficulty": 3,
+  "competencies": [
+   "c3",
+   "c6"
+  ],
+  "context": "PG muốn thêm vị trí trưng bày cho mã sản phẩm mới nhưng CHT chưa tin khả năng bán.",
+  "pg_data": "mã sản phẩm mới chưa có sell-out tại cửa hàng; số liệu cửa hàng khác nếu không được cấp thì không tồn tại trong tình huống.",
+  "opening": "Hàng mới chưa biết bán ra sao, anh không cho thêm chỗ đâu.",
+  "hidden": [
+   {
+    "trigger": "rủi ro",
+    "reveal": "CHT lo chiếm chỗ của hàng đang bán tốt."
+   },
+   {
+    "trigger": "khả năng thử",
+    "reveal": "có thể xem xét cuối kệ trong ba ngày nếu không tăng tồn bất hợp lý."
+   }
+  ],
+  "good_reaction": "Nếu PG đưa thử nghiệm nhỏ, mốc đo và cách thu hồi, CHT hỏi tiêu chí dừng thử.",
+  "poor_reaction": "Nếu PG khẳng định chắc chắn bán chạy: Em có số liệu của chính cửa hàng này chưa?",
+  "behaviors": [
+   "Nhận diện rủi ro của cửa hàng.",
+   "Đề xuất phạm vi thử nhỏ có chỉ số.",
+   "Làm rõ phê duyệt và điều kiện kết thúc."
+  ],
+  "critical_error": "Bịa lịch sử bán của mã sản phẩm mới hoặc tự nhận đã được duyệt trưng bày."
+ },
+ {
+  "code": "CHT04",
+  "title": "Store muốn giảm lượng đặt vì tồn cao",
+  "group": "store_manager",
+  "group_label": "Cửa hàng trưởng",
+  "difficulty": 3,
+  "competencies": [
+   "c2",
+   "c6"
+  ],
+  "context": "CHT dự định giảm đặt một nhóm hàng; PG cần phân tích chậm bán trước khi đề nghị.",
+  "pg_data": "Giả định: A tồn 80, bán 10/tuần; B tồn 6, bán 30/tuần. Chưa biết thời gian chờ giao hàng, phải hỏi/kiểm tra trước khi chốt lượng đặt.",
+  "opening": "Kho còn nhiều, anh không đặt thêm cho em đâu.",
+  "hidden": [
+   {
+    "trigger": "theo mã",
+    "reveal": "tồn tập trung ở mã A, trong khi mã B bán nhanh."
+   },
+   {
+    "trigger": "trưng bày",
+    "reveal": "mã A nằm ở tầng thấp, B thường hết kệ cuối ngày."
+   }
+  ],
+  "good_reaction": "Nếu PG tách từng mã và không ép nhập A, CHT sẵn sàng xem lại mức bổ sung B.",
+  "poor_reaction": "Nếu PG chỉ xin thêm cả nhóm: Em muốn anh ôm thêm hàng tồn à?",
+  "behaviors": [
+   "Hỏi tồn và bán theo mã sản phẩm.",
+   "Phân biệt vấn đề danh mục với tổng tồn.",
+   "Đề xuất xử lý A và bổ sung B theo dữ liệu, cần cửa hàng duyệt."
+  ],
+  "critical_error": "Gộp tồn mọi mã sản phẩm rồi cam kết chắc sẽ bán hết nếu đặt thêm."
+ },
+ {
+  "code": "CHT05",
+  "title": "Hàng gần hạn cần phương án được duyệt",
+  "group": "store_manager",
+  "group_label": "Cửa hàng trưởng",
+  "difficulty": 3,
+  "competencies": [
+   "c5",
+   "c6"
+  ],
+  "context": "CHT muốn PG tự giảm giá hàng gần hạn để giải phóng tồn.",
+  "pg_data": "24 đơn vị, 45 ngày là giả định; không có phê duyệt giảm giá, đổi trả hoặc thu hồi trong tình huống.",
+  "opening": "Em giảm giá ngay cho anh đi, để lâu không bán được.",
+  "hidden": [
+   {
+    "trigger": "tồn/hạn",
+    "reveal": "24 đơn vị cùng lô còn 45 ngày."
+   },
+   {
+    "trigger": "quyền điều chỉnh",
+    "reveal": "CHT chưa có phê duyệt chương trình dành cho lô này."
+   }
+  ],
+  "good_reaction": "Nếu PG đề nghị kiểm tra chính sách và gửi phương án đúng đầu mối, CHT hỏi khi nào nhận được cập nhật.",
+  "poor_reaction": "Nếu PG chỉ nói không phải việc em: Vậy hàng nằm đây ai xử lý?",
+  "behaviors": [
+   "Thu thập tồn/lô/hạn.",
+   "Không tự thay đổi giá.",
+   "Thống nhất đầu mối và thời điểm cập nhật khả thi."
+  ],
+  "critical_error": "Tự giảm giá, đổi tem hạn hoặc hứa hãng bù tiền khi chưa được duyệt."
+ },
+ {
+  "code": "CHT06",
+  "title": "Xin tổ chức dùng thử nhưng store thiếu người",
+  "group": "store_manager",
+  "group_label": "Cửa hàng trưởng",
+  "difficulty": 2,
+  "competencies": [
+   "c5",
+   "c6"
+  ],
+  "context": "PG đề nghị một buổi dùng thử. CHT lo vệ sinh, chỗ đứng và khối lượng việc cho nhân viên.",
+  "pg_data": "Chưa có kế hoạch sampling được phê duyệt; không được tự bịa thủ tục BHX.",
+  "opening": "Cuối tuần anh thiếu người, đừng thêm việc cho cửa hàng.",
+  "hidden": [
+   {
+    "trigger": "phần gây tải",
+    "reveal": "dọn dẹp và tập trung khách ở lối đi."
+   },
+   {
+    "trigger": "phương án",
+    "reveal": "CHT chỉ xem xét nếu có kế hoạch nhân sự, vị trí và quy trình đã duyệt."
+   }
+  ],
+  "good_reaction": "Nếu PG đề nghị bổ sung kế hoạch rõ trách nhiệm, CHT đồng ý xem xét, chưa chấp thuận ngay.",
+  "poor_reaction": "Nếu PG nói tụi em tự làm là được: Ai chịu trách nhiệm phần vệ sinh và khách tụ lại?",
+  "behaviors": [
+   "Hỏi ràng buộc vận hành.",
+   "Phân công trách nhiệm trong đề xuất.",
+   "Xin phê duyệt trước, không coi xem xét là đã đồng ý."
+  ],
+  "critical_error": "Tự triển khai dùng thử khi chưa được phép hoặc bỏ qua yêu cầu vệ sinh."
+ },
+ {
+  "code": "CHT07",
+  "title": "Lịch hiện diện PG không trùng giờ khách đông",
+  "group": "store_manager",
+  "group_label": "Cửa hàng trưởng",
+  "difficulty": 2,
+  "competencies": [
+   "c2",
+   "c6"
+  ],
+  "context": "CHT phàn nàn PG thường có mặt lúc vắng, thiếu hỗ trợ vào cao điểm.",
+  "pg_data": "Giờ cao điểm là dữ liệu giả định của tình huống, không đại diện mọi BHX.",
+  "opening": "Khách đông thì không thấy em, tới lúc vắng mới đứng đây.",
+  "hidden": [
+   {
+    "trigger": "giờ cần",
+    "reveal": "17–19 giờ ngày thứ Sáu."
+   },
+   {
+    "trigger": "lịch hiện tại",
+    "reveal": "PG đang có lịch tuyến do SUP phân công, không thể tự thay toàn bộ."
+   }
+  ],
+  "good_reaction": "Nếu PG ghi nhận nhu cầu và đề nghị phối hợp SUP điều chỉnh, CHT hỏi thời hạn phản hồi.",
+  "poor_reaction": "Nếu PG tự hứa từ mai đứng cả ngày: Em có chắc sắp xếp được không?",
+  "behaviors": [
+   "Xác định khung cao điểm.",
+   "Nêu phạm vi có thể chủ động.",
+   "Hẹn phản hồi sau khi phối hợp người quản lý lịch."
+  ],
+  "critical_error": "Tự cam kết lịch trái phân công hoặc đổ lỗi cho SUP."
+ },
+ {
+  "code": "CHT08",
+  "title": "CHT phản ánh PG làm phiền khách",
+  "group": "store_manager",
+  "group_label": "Cửa hàng trưởng",
+  "difficulty": 3,
+  "competencies": [
+   "c1",
+   "c5",
+   "c6"
+  ],
+  "context": "CHT nhận phản ánh PG theo khách quá lâu và thúc mua combo.",
+  "pg_data": "Đây là trao đổi coaching giả định; kết quả thoại không tự chứng minh C7 ngoài thực địa.",
+  "opening": "Khách nói em bám theo hoài, anh không muốn nhận thêm phàn nàn.",
+  "hidden": [
+   {
+    "trigger": "ví dụ",
+    "reveal": "một khách đã nói muốn tự xem nhưng PG tiếp tục đi theo."
+   },
+   {
+    "trigger": "mong đợi",
+    "reveal": "dừng tư vấn khi khách từ chối và tiếp cận phù hợp."
+   }
+  ],
+  "good_reaction": "Nếu PG ghi nhận sự việc và đề xuất hành vi sửa cụ thể, CHT đồng ý quan sát lại ở ca tới.",
+  "poor_reaction": "Nếu PG viện KPI: Chỉ tiêu của em không thể làm khách khó chịu.",
+  "behaviors": [
+   "Hỏi tình huống cụ thể không truy lỗi khách.",
+   "Nhận trách nhiệm trong phạm vi mình.",
+   "Chốt hành vi sửa và mốc theo dõi."
+  ],
+  "critical_error": "Tranh cãi, phủ nhận phản ánh chưa xác minh hoặc yêu cầu tiết lộ dữ liệu cá nhân khách không cần thiết."
+ },
+ {
+  "code": "CHT09",
+  "title": "Mất niềm tin vì nhiều lần thiếu hàng",
+  "group": "store_manager",
+  "group_label": "Cửa hàng trưởng",
+  "difficulty": 3,
+  "competencies": [
+   "c5",
+   "c6"
+  ],
+  "context": "CHT không muốn giữ thêm chỗ vì mã sản phẩm từng hết hàng nhiều ngày. PG phải trao đổi khi lịch giao chưa được xác nhận.",
+  "pg_data": "Hai đợt thiếu là giả định; chưa có dữ liệu tồn DC hoặc lịch giao.",
+  "opening": "Giữ kệ cho em rồi hàng không về thì anh bán gì?",
+  "hidden": [
+   {
+    "trigger": "lịch sử",
+    "reveal": "cửa hàng có hai đợt thiếu trong tháng."
+   },
+   {
+    "trigger": "điều kiện hợp tác",
+    "reveal": "CHT cần mốc cập nhật và phương án tạm thời, không muốn nghe hứa chắc."
+   }
+  ],
+  "good_reaction": "Nếu PG tách điều đã biết/chưa biết và đề nghị kiểm tra cung ứng cùng SUP, CHT đồng ý chờ bản cập nhật có thời hạn.",
+  "poor_reaction": "Nếu PG hứa mai hàng về dù chưa có lịch: Lần trước cũng nói vậy đó.",
+  "behaviors": [
+   "Ghi nhận tác động hết hàng.",
+   "Không hứa lịch ngoài kiểm soát.",
+   "Chốt đầu mối, mốc cập nhật và phương án trưng bày tạm cần duyệt."
+  ],
+  "critical_error": "Bịa ngày giao hoặc nhận có hàng ở DC khi chưa xác nhận."
+ },
+ {
+  "code": "CHT10",
+  "title": "Muốn độc quyền đầu kệ đang chia cho nhiều nhãn",
+  "group": "store_manager",
+  "group_label": "Cửa hàng trưởng",
+  "difficulty": 3,
+  "competencies": [
+   "c5",
+   "c6"
+  ],
+  "context": "PG xin tăng diện tích đầu kệ trong khi cửa hàng đang chia vị trí cho nhiều nhà cung cấp.",
+  "pg_data": "Không có hợp đồng trưng bày cụ thể; chỉ được đề nghị kiểm tra với người có thẩm quyền.",
+  "opening": "Anh đã chia vị trí rồi, không thể ưu tiên riêng bên em hết được.",
+  "hidden": [
+   {
+    "trigger": "tiêu chí",
+    "reveal": "cửa hàng xét hiệu quả bán và thỏa thuận trưng bày."
+   },
+   {
+    "trigger": "khả năng điều chỉnh",
+    "reveal": "có thể bàn khung thời gian luân phiên sau khi kiểm tra cam kết hiện có."
+   }
+  ],
+  "good_reaction": "Nếu PG xin xem nguyên tắc phân bổ và đề xuất luân phiên, CHT hỏi giai đoạn nào và đo hiệu quả ra sao.",
+  "poor_reaction": "Nếu PG đòi tháo hàng đối thủ ngay: Em không có quyền quyết định phần đó.",
+  "behaviors": [
+   "Tôn trọng thỏa thuận hiện có.",
+   "Tìm tiêu chí phân bổ.",
+   "Đề xuất phương án thương lượng có kiểm chứng thay vì đòi độc quyền."
+  ],
+  "critical_error": "Tự di chuyển hàng đối thủ hoặc viện hợp đồng/phí chưa được cung cấp."
+ },
+ {
+  "code": "NV01",
+  "title": "Kệ sắp hết nhưng nhân viên kho đang bận",
+  "group": "store_staff",
+  "group_label": "Phối hợp tại cửa hàng",
+  "difficulty": 1,
+  "competencies": [
+   "c2",
+   "c6"
+  ],
+  "context": "Kệ chỉ còn hai đơn vị, kho cửa hàng còn hàng; nhân viên đang xử lý đợt nhận hàng.",
+  "pg_data": "Giả định: kệ 2, kho cửa hàng 24. Vấn đề là thiếu hàng trên kệ, không được suy thành tồn trung tâm phân phối bằng 0.",
+  "opening": "Chị đang nhận hàng, lát nữa mới châm giúp em được.",
+  "hidden": [
+   {
+    "trigger": "mức bận",
+    "reveal": "cần khoảng 15 phút hoàn tất bước đang làm."
+   },
+   {
+    "trigger": "việc PG được hỗ trợ",
+    "reveal": "có thể cùng kiểm tra vị trí kệ, không tự vào khu hạn chế."
+   }
+  ],
+  "good_reaction": "Nếu PG nói rõ nguy cơ hết kệ và hỏi mốc hỗ trợ cụ thể, nhân viên thống nhất kiểm tra sau khi xong bước nhận hàng.",
+  "poor_reaction": "Nếu PG ra lệnh phải làm ngay: Chị còn việc khác, đâu chỉ hàng của em.",
+  "behaviors": [
+   "Nêu đúng tồn trên kệ và tồn kho cửa hàng.",
+   "Hỏi trở ngại/mốc hỗ trợ.",
+   "Nhận phần việc đúng quyền hạn và xác nhận lại."
+  ],
+  "critical_error": "Tự vào kho lấy hàng khi chưa được phép."
+ },
+ {
+  "code": "NV02",
+  "title": "Hệ thống báo còn nhưng không tìm thấy hàng",
+  "group": "store_staff",
+  "group_label": "Phối hợp tại cửa hàng",
+  "difficulty": 2,
+  "competencies": [
+   "c2",
+   "c6"
+  ],
+  "context": "Nhân viên thấy hệ thống ghi 18 đơn vị nhưng kiểm vị trí quen thuộc không có.",
+  "pg_data": "18 là tồn hệ thống giả định; không xác nhận tồn thực tế hoặc nguyên nhân lệch.",
+  "opening": "Máy báo còn nhưng chị tìm không thấy, em đừng thúc châm nữa.",
+  "hidden": [
+   {
+    "trigger": "bước đã kiểm",
+    "reveal": "mới kiểm một khu."
+   },
+   {
+    "trigger": "khác biệt mã",
+    "reveal": "có hai mã bao bì gần giống nhau, chưa đối chiếu mã vạch."
+   }
+  ],
+  "good_reaction": "Nếu PG đề nghị đối chiếu mã và phối hợp kiểm theo quy trình, nhân viên đồng ý kiểm cùng người phụ trách.",
+  "poor_reaction": "Nếu PG nói nhân viên giấu hàng: Em nói vậy là ý gì?",
+  "behaviors": [
+   "Xác định đúng mã.",
+   "Phân biệt tồn hệ thống với tồn kiểm thực tế.",
+   "Báo chênh lệch đúng đầu mối khi chưa tìm được."
+  ],
+  "critical_error": "Quy kết gian lận hoặc tự sửa số tồn."
+ },
+ {
+  "code": "NV03",
+  "title": "Hàng đúng nhưng đặt nhầm ô giá",
+  "group": "store_staff",
+  "group_label": "Phối hợp tại cửa hàng",
+  "difficulty": 2,
+  "competencies": [
+   "c3",
+   "c6"
+  ],
+  "context": "PG thấy mã sản phẩm của mình nằm ở vị trí có bảng giá mã sản phẩm khác; nhân viên vừa châm nhiều loại hàng.",
+  "pg_data": "Giả định hai mã sản phẩm khác giá; không cung cấp mức giá và không đặt quy định nội bộ mới.",
+  "opening": "Để tạm vậy chút, chị chưa kịp đổi chỗ.",
+  "hidden": [
+   {
+    "trigger": "tình trạng",
+    "reveal": "giá hai mã khác nhau và chưa có khách phản ánh."
+   },
+   {
+    "trigger": "hỗ trợ",
+    "reveal": "nhân viên muốn xác định đúng ô theo sơ đồ hiện hành."
+   }
+  ],
+  "good_reaction": "Nếu PG nêu rủi ro nhầm giá và phối hợp đối chiếu mã/ô, nhân viên xử lý trước khi tiếp tục châm.",
+  "poor_reaction": "Nếu PG tự bóc tem giá: Em không được tự thay tem trên kệ.",
+  "behaviors": [
+   "Đối chiếu mã với ô/tem.",
+   "Nêu ảnh hưởng đến khách thay vì đổ lỗi.",
+   "Phối hợp người có quyền sửa vị trí/tem."
+  ],
+  "critical_error": "Tự sửa giá hoặc di chuyển không đối chiếu vị trí được duyệt."
+ },
+ {
+  "code": "NV04",
+  "title": "Lô mới che lô cũ trên kệ",
+  "group": "store_staff",
+  "group_label": "Phối hợp tại cửa hàng",
+  "difficulty": 2,
+  "competencies": [
+   "c2",
+   "c6"
+  ],
+  "context": "Nhân viên châm lô mới ra phía trước, PG nhận thấy lô hạn sớm còn phía sau.",
+  "pg_data": "Không mặc định FIFO giải quyết mọi trường hợp; ưu tiên kiểm tra quy trình hạn dùng/FEFO được cửa hàng áp dụng.",
+  "opening": "Xếp nhanh vậy thôi, khách lấy hàng mới cũng được mà.",
+  "hidden": [
+   {
+    "trigger": "lý do",
+    "reveal": "nhân viên đang gấp để xử lý ngành hàng khác."
+   },
+   {
+    "trigger": "đối chiếu hạn",
+    "reveal": "lô phía sau hết hạn sớm hơn, cả hai lô vẫn còn hạn."
+   }
+  ],
+  "good_reaction": "Nếu PG đề nghị cùng đối chiếu và sắp theo quy trình xoay vòng của cửa hàng, nhân viên đồng ý phần hỗ trợ được phép.",
+  "poor_reaction": "Nếu PG nói nhân viên làm sai trước mặt khách: Em góp ý thì nói riêng, đừng nói vậy ở đây.",
+  "behaviors": [
+   "Góp ý tôn trọng.",
+   "Dựa trên hạn thực tế và quy trình cửa hàng.",
+   "Thống nhất hỗ trợ xoay vòng trong phạm vi được phép."
+  ],
+  "critical_error": "Che hạn, đổi nhãn hoặc tự quyết tiêu hủy hàng."
+ },
+ {
+  "code": "NV05",
+  "title": "Phát hiện bao bì rò rỉ khi bổ sung",
+  "group": "store_staff",
+  "group_label": "Phối hợp tại cửa hàng",
+  "difficulty": 2,
+  "competencies": [
+   "c3",
+   "c6"
+  ],
+  "context": "Một đơn vị sản phẩm có dấu hiệu rò rỉ, nhân viên định lau sạch rồi đưa ra kệ.",
+  "pg_data": "Chỉ một đơn vị có dấu hiệu bất thường; không hướng dẫn kỹ thuật xử lý thực phẩm hoặc tiêu hủy.",
+  "opening": "Lau khô là được, bỏ ra bán vẫn bình thường mà.",
+  "hidden": [
+   {
+    "trigger": "hiện trạng",
+    "reveal": "đường ghép bao bì bị ướt, chưa xác định nguồn rò."
+   },
+   {
+    "trigger": "xử lý",
+    "reveal": "cần báo người phụ trách theo quy trình hàng bất thường."
+   }
+  ],
+  "good_reaction": "Nếu PG đề nghị tạm ngừng đưa đơn vị đó ra bán và chuyển đầu mối xử lý, nhân viên đồng ý báo quản lý ca.",
+  "poor_reaction": "Nếu PG tranh cãi gay gắt: Em đừng làm ầm lên trước khách.",
+  "behaviors": [
+   "Nhận diện rủi ro đúng phạm vi.",
+   "Đề nghị xử lý theo quy trình và người có trách nhiệm.",
+   "Không tự kết luận nguyên nhân/chất lượng toàn lô."
+  ],
+  "critical_error": "Đưa hàng nghi hỏng trở lại bán hoặc tự kết luận cả lô đều lỗi."
+ },
+ {
+  "code": "NV06",
+  "title": "Nhờ PG tự vào khu kho hạn chế",
+  "group": "store_staff",
+  "group_label": "Phối hợp tại cửa hàng",
+  "difficulty": 2,
+  "competencies": [
+   "c5",
+   "c6"
+  ],
+  "context": "Nhân viên bận và bảo PG tự đi lấy hàng trong khu kho mà PG chưa được phép vào.",
+  "pg_data": "Giới hạn truy cập này là điều kiện riêng của tình huống, không khẳng định là quy định chung của mọi cửa hàng.",
+  "opening": "Em biết chỗ rồi đó, tự vô lấy cho nhanh đi.",
+  "hidden": [
+   {
+    "trigger": "quyền truy cập",
+    "reveal": "PG chưa được hướng dẫn hoặc cấp quyền."
+   },
+   {
+    "trigger": "phương án khác",
+    "reveal": "có nhân viên được phép vào nhưng đang ở quầy khác."
+   }
+  ],
+  "good_reaction": "Nếu PG từ chối lịch sự và nhờ người được phép hỗ trợ, nhân viên đề nghị liên hệ người phụ trách ca.",
+  "poor_reaction": "Nếu PG nhận lời đi vào: Nhân vật tiếp tục chỉ vị trí, không tự sửa sai thay PG; đánh dấu lỗi khi tổng kết.",
+  "behaviors": [
+   "Nêu giới hạn rõ.",
+   "Không làm mất mặt nhân viên.",
+   "Đề xuất cách lấy hàng qua người có quyền."
+  ],
+  "critical_error": "Tự ý vào khu hạn chế hoặc mượn thẻ/mã truy cập của người khác."
+ },
+ {
+  "code": "NV07",
+  "title": "Bàn giao ca làm mất thông tin đã thống nhất",
+  "group": "store_staff",
+  "group_label": "Phối hợp tại cửa hàng",
+  "difficulty": 2,
+  "competencies": [
+   "c2",
+   "c6"
+  ],
+  "context": "PG đã nhờ ca trước bổ sung hàng nhưng ca sau không nhận được thông tin.",
+  "pg_data": "Không có xác nhận châm hàng đã hoàn tất; chỉ có trao đổi đề nghị trước đó.",
+  "opening": "Chị mới vô ca, không ai bàn giao việc này cho chị hết.",
+  "hidden": [
+   {
+    "trigger": "dữ liệu bàn giao",
+    "reveal": "PG có mã mã sản phẩm, số lượng đề nghị và thời điểm trao đổi."
+   },
+   {
+    "trigger": "mức cấp thiết",
+    "reveal": "kệ còn ít nhưng chưa hết."
+   }
+  ],
+  "good_reaction": "Nếu PG tóm tắt thông tin và hỏi lại kế hoạch ca mới, nhân viên đồng ý ghi nhận và xác nhận mốc thực hiện.",
+  "poor_reaction": "Nếu PG trách ca trước vô trách nhiệm: Chị không biết chuyện đó, em đừng kéo chị vào.",
+  "behaviors": [
+   "Tóm tắt việc/mã/mức ưu tiên.",
+   "Kiểm tra ai đang nhận trách nhiệm.",
+   "Chốt lại mốc cập nhật và cách ghi nhận."
+  ],
+  "critical_error": "Bịa đã được phê duyệt hoặc đổ lỗi cá nhân thay vì làm rõ bàn giao."
+ },
+ {
+  "code": "NV08",
+  "title": "Nhân viên và PG hiểu khác thể lệ tại quầy",
+  "group": "store_staff",
+  "group_label": "Phối hợp tại cửa hàng",
+  "difficulty": 3,
+  "competencies": [
+   "c3",
+   "c5",
+   "c6"
+  ],
+  "context": "Khách chưa đến thanh toán; nhân viên ngành hàng và PG đọc hai phiên bản thông báo khuyến mãi khác nhau.",
+  "pg_data": "Không tự kết luận bản mới chắc chắn áp dụng cho cùng mã sản phẩm/thời gian nếu chưa kiểm tra đầy đủ.",
+  "opening": "Chị nhớ chương trình phải mua ba, em đừng nói mua hai với khách.",
+  "hidden": [
+   {
+    "trigger": "phiên bản",
+    "reveal": "bản PG cầm cũ hơn bản nhân viên đang xem."
+   },
+   {
+    "trigger": "xác nhận",
+    "reveal": "cả hai cần kiểm tra thông báo hiện hành với đầu mối có trách nhiệm."
+   }
+  ],
+  "good_reaction": "Nếu PG dừng thông tin chưa chắc và đề nghị cùng xác minh, nhân viên hợp tác thông báo lại thống nhất.",
+  "poor_reaction": "Nếu PG tranh đúng sai ngay trước khách: Nhân viên phản ứng phòng thủ và yêu cầu quản lý can thiệp.",
+  "behaviors": [
+   "Nhận diện xung đột phiên bản.",
+   "Tạm dừng cam kết với khách.",
+   "Thống nhất một nguồn hiện hành và người cập nhật."
+  ],
+  "critical_error": "Cố chốt điều kiện khi hai nguồn chưa được đối chiếu hoặc làm khách hiểu đã được bảo đảm ưu đãi."
+ },
+ {
+  "code": "NV09",
+  "title": "Tranh vị trí với PG nhãn khác",
+  "group": "store_staff",
+  "group_label": "Phối hợp tại cửa hàng",
+  "difficulty": 3,
+  "competencies": [
+   "c5",
+   "c6"
+  ],
+  "context": "PG của nhãn hàng khác đang đặt vật phẩm che một phần sản phẩm của bạn; chưa rõ ai được duyệt vị trí.",
+  "pg_data": "Không quy định nhãn nào đúng; kết thúc tốt là có phương án xác minh, không bắt buộc giành được vị trí.",
+  "opening": "Bên chị vẫn để ở đây mà, em đừng đụng vào.",
+  "hidden": [
+   {
+    "trigger": "căn cứ",
+    "reveal": "người kia nói được trao đổi miệng với một nhân viên, chưa có xác nhận từ CHT."
+   },
+   {
+    "trigger": "đề nghị cùng kiểm tra",
+    "reveal": "người kia ngại bị quy lỗi trước khách."
+   }
+  ],
+  "good_reaction": "Nếu PG giữ giọng hợp tác và mời người phụ trách xác nhận, nhân vật đồng ý kiểm tra riêng.",
+  "poor_reaction": "Nếu PG tự gỡ vật phẩm: Nhân vật phản đối mạnh và yêu cầu quản lý.",
+  "behaviors": [
+   "Mô tả hiện trạng trung tính.",
+   "Hỏi căn cứ vị trí.",
+   "Nhờ người có thẩm quyền xác nhận và cùng thực hiện quyết định."
+  ],
+  "critical_error": "Tự tháo hàng/vật phẩm, xúc phạm hoặc cản trở công việc của nhãn khác."
+ },
+ {
+  "code": "NV10",
+  "title": "Sự cố đổ tràn giữa lúc khách đông",
+  "group": "store_staff",
+  "group_label": "Phối hợp tại cửa hàng",
+  "difficulty": 2,
+  "competencies": [
+   "c5",
+   "c6"
+  ],
+  "context": "Một chai bị đổ gần quầy tạo mặt sàn ướt. Nhân viên đang phục vụ khách khác.",
+  "pg_data": "Không có chấn thương trong tình huống; chỉ đánh giá phối hợp và ưu tiên, không mô phỏng sơ cứu.",
+  "opening": "Chị đang tính tiền, em chờ chút rồi báo người lau nha.",
+  "hidden": [
+   {
+    "trigger": "đầu mối",
+    "reveal": "có quản lý ca hỗ trợ điều phối."
+   },
+   {
+    "trigger": "nêu nguy cơ",
+    "reveal": "người qua lại chưa nhận ra nền ướt."
+   }
+  ],
+  "good_reaction": "Nếu PG ưu tiên cảnh báo khách từ vị trí an toàn và báo người phụ trách ngay, nhân viên gọi hỗ trợ.",
+  "poor_reaction": "Nếu PG tiếp tục tư vấn bán hàng mà bỏ qua: Nhân vật hỏi em có thấy người đi ngang không?",
+  "behaviors": [
+   "Ưu tiên an toàn trước bán hàng.",
+   "Báo đúng người và cảnh báo từ vị trí an toàn.",
+   "Không tự xử lý việc ngoài năng lực/quy trình."
+  ],
+  "critical_error": "Bỏ qua nguy cơ trượt ngã hoặc hướng dẫn PG xử lý hóa chất/vật vỡ ngoài huấn luyện."
+ },
+ {
+  "code": "KM01",
+  "title": "Mua khác mã nên không đủ điều kiện nhận quà",
+  "group": "promotion",
+  "group_label": "Khuyến mãi & SKU",
+  "difficulty": 1,
+  "competencies": [
+   "c3",
+   "c5"
+  ],
+  "context": "Khách chọn một chai mã A và một chai mã B, cho rằng mua hai chai bất kỳ đều có quà.",
+  "pg_data": "Thể lệ GIẢ ĐỊNH cấp cho PG: mua 2 chai mã A trong cùng hóa đơn nhận 1 quà Q; mã B không tham gia; quà còn.",
+  "opening": "Chị lấy hai chai rồi, sao em bảo chưa được quà?",
+  "hidden": [
+   {
+    "trigger": "mong muốn",
+    "reveal": "khách thực sự cần mỗi loại một chai."
+   },
+   {
+    "trigger": "sẵn sàng đổi",
+    "reveal": "không muốn thêm hàng chỉ để nhận quà."
+   }
+  ],
+  "good_reaction": "Nếu PG giải thích điều kiện đúng mã và không ép đổi nhu cầu, khách giữ giỏ hiện tại, chấp nhận không nhận quà.",
+  "poor_reaction": "Nếu PG ép đổi cả giỏ sang A: Chị có cần hai chai giống nhau đâu.",
+  "behaviors": [
+   "Đối chiếu đúng mã trên thể lệ.",
+   "Giải thích dễ hiểu.",
+   "Tôn trọng nhu cầu và quyền không tham gia ưu đãi."
+  ],
+  "critical_error": "Gộp mã không đủ điều kiện hoặc hứa quà ngoại lệ."
+ },
+ {
+  "code": "KM02",
+  "title": "Đơn chưa đạt ngưỡng vì không phải toàn giỏ được tính",
+  "group": "promotion",
+  "group_label": "Khuyến mãi & SKU",
+  "difficulty": 2,
+  "competencies": [
+   "c2",
+   "c3",
+   "c5"
+  ],
+  "context": "Khách có tổng giỏ 230.000đ nhưng chỉ một phần là mã sản phẩm thuộc chương trình.",
+  "pg_data": "Giả định: ngưỡng 200.000đ hàng tham gia; khách hiện có 150.000đ hàng tham gia và 80.000đ hàng khác. Thiếu 50.000đ; nếu thêm đủ tổng giỏ 280.000đ, vượt ngân sách.",
+  "opening": "Giỏ chị hơn hai trăm rồi mà, sao lại chưa đủ?",
+  "hidden": [
+   {
+    "trigger": "ưu tiên",
+    "reveal": "khách không muốn vượt 250.000đ tổng giỏ."
+   },
+   {
+    "trigger": "nhu cầu còn thiếu",
+    "reveal": "chưa chắc cần thêm sản phẩm tham gia."
+   }
+  ],
+  "good_reaction": "Nếu PG phân biệt tổng giỏ và giá trị mã sản phẩm tham gia, khách hỏi còn thiếu bao nhiêu và có cần mua thêm thật không.",
+  "poor_reaction": "Nếu PG chỉ bảo mua thêm cho đủ: Em nói rõ cách tính cho chị trước đã.",
+  "behaviors": [
+   "Tính đúng phần được tính.",
+   "Nêu rõ chênh lệch.",
+   "Chỉ gợi ý thêm khi phù hợp nhu cầu/ngân sách."
+  ],
+  "critical_error": "Tính cả mã sản phẩm không tham gia hoặc bỏ qua ngân sách."
+ },
+ {
+  "code": "KM03",
+  "title": "Đủ điều kiện nhưng quà tại store đã hết",
+  "group": "promotion",
+  "group_label": "Khuyến mãi & SKU",
+  "difficulty": 2,
+  "competencies": [
+   "c3",
+   "c5"
+  ],
+  "context": "Khách đủ điều kiện chương trình, quà ở cửa hàng hết và PG chưa có thông tin bổ sung.",
+  "pg_data": "Giả định: thể lệ ghi quà có số lượng giới hạn; chưa có quy định đặt giữ hay quà thay thế. Không diễn giải thành khách mất mọi quyền phản ánh.",
+  "opening": "Đủ hóa đơn rồi mà không có quà, vậy chương trình để làm gì?",
+  "hidden": [
+   {
+    "trigger": "khách đã quyết định mua vì gì",
+    "reveal": "ưu tiên ban đầu là sản phẩm, nhưng khó chịu vì chưa được báo hết quà."
+   },
+   {
+    "trigger": "mong muốn",
+    "reveal": "cần câu trả lời rõ, không hẹn mơ hồ."
+   }
+  ],
+  "good_reaction": "Nếu PG xin lỗi vì thông tin chưa rõ, nói đúng tình trạng và nhờ cửa hàng kiểm tra phương án hợp lệ, khách chờ xác nhận ngắn.",
+  "poor_reaction": "Nếu PG hứa tuần sau có quà: Em có chắc không, chị không muốn đi lại nhiều lần.",
+  "behaviors": [
+   "Ghi nhận bức xúc.",
+   "Nói rõ điều đã biết/chưa biết.",
+   "Đưa lựa chọn minh bạch trước khi khách quyết định mua."
+  ],
+  "critical_error": "Hứa giữ/bù quà hoặc đổi sang quà khác khi chưa được duyệt."
+ },
+ {
+  "code": "KM04",
+  "title": "Giá trên kệ khác giá tại quầy thanh toán",
+  "group": "promotion",
+  "group_label": "Khuyến mãi & SKU",
+  "difficulty": 3,
+  "competencies": [
+   "c3",
+   "c5"
+  ],
+  "context": "Khách quay lại tìm PG vì số tiền tại quầy cao hơn bảng giá vừa xem.",
+  "pg_data": "Giá giả định: bảng khách chụp 28.000đ, quầy 32.000đ; chưa xác nhận cùng mã sản phẩm hoặc chính sách giải quyết.",
+  "opening": "Em nói giá này, ra quầy tính giá khác, chị bị lừa à?",
+  "hidden": [
+   {
+    "trigger": "chi tiết",
+    "reveal": "khách có ảnh ô giá và mã hàng."
+   },
+   {
+    "trigger": "đối chiếu",
+    "reveal": "chưa xác định nguyên nhân là tem cũ hay nhầm mã sản phẩm."
+   }
+  ],
+  "good_reaction": "Nếu PG nhận hỗ trợ đối chiếu và mời nhân viên có quyền xử lý, khách cung cấp ảnh và chờ.",
+  "poor_reaction": "Nếu PG tự hứa áp giá thấp ngay: Khách yêu cầu xác nhận tại quầy lập tức.",
+  "behaviors": [
+   "Xoa dịu mà không kết luận lỗi.",
+   "Đối chiếu mã, tem, thời gian.",
+   "Chuyển đúng người và theo dõi kết quả."
+  ],
+  "critical_error": "Tự quyết mức giá/hoàn chênh lệch hoặc đổ lỗi khách chưa kiểm tra."
+ },
+ {
+  "code": "KM05",
+  "title": "Khách không muốn đăng ký thành viên",
+  "group": "promotion",
+  "group_label": "Khuyến mãi & SKU",
+  "difficulty": 2,
+  "competencies": [
+   "c2",
+   "c3",
+   "c5"
+  ],
+  "context": "Khách hỏi giá ưu đãi nhưng không muốn cung cấp số điện thoại để tham gia điều kiện thành viên.",
+  "pg_data": "Thể lệ giả định: giá thường 35.000đ, giá thành viên đủ điều kiện 30.000đ; không cung cấp chính sách dữ liệu cá nhân.",
+  "opening": "Chị không muốn đưa số điện thoại, có được giá đó không?",
+  "hidden": [
+   {
+    "trigger": "điều khách lo",
+    "reveal": "sợ nhận cuộc gọi quảng cáo."
+   },
+   {
+    "trigger": "lựa chọn",
+    "reveal": "khách chấp nhận nghe giá thường, không cần được thuyết phục đăng ký."
+   }
+  ],
+  "good_reaction": "Nếu PG nói rõ hai mức giá và tôn trọng lựa chọn, khách quyết định theo mức không thành viên.",
+  "poor_reaction": "Nếu PG xin dùng số của người khác: Nhân vật hỏi làm vậy có đúng không.",
+  "behaviors": [
+   "Giải thích điều kiện ưu đãi.",
+   "Tôn trọng việc không đăng ký.",
+   "Không thu thập thông tin ngoài nhu cầu."
+  ],
+  "critical_error": "Tự dùng số người khác, đăng ký hộ không có đồng ý hoặc bảo đảm cách dùng dữ liệu chưa có nguồn."
+ },
+ {
+  "code": "KM06",
+  "title": "Mang ảnh khuyến mãi đã hết thời gian",
+  "group": "promotion",
+  "group_label": "Khuyến mãi & SKU",
+  "difficulty": 1,
+  "competencies": [
+   "c3",
+   "c5"
+  ],
+  "context": "Khách đưa ảnh chương trình trong điện thoại và yêu cầu áp dụng hôm nay.",
+  "pg_data": "Giả định ngày trong phiên là 15/10; ảnh ghi hiệu lực 10–12/10. Không phải lịch khuyến mãi BHX thực tế.",
+  "opening": "Hôm trước thấy quảng cáo giá này, giờ em tính vậy là sao?",
+  "hidden": [
+   {
+    "trigger": "nguồn/thời gian ảnh",
+    "reveal": "ảnh lưu từ tuần trước."
+   },
+   {
+    "trigger": "nhu cầu",
+    "reveal": "khách vẫn cần sản phẩm nhưng muốn biết giá hôm nay trước."
+   }
+  ],
+  "good_reaction": "Nếu PG chỉ ngày hiệu lực lịch sự và kiểm tra giá hiện tại, khách cân nhắc theo thông tin mới.",
+  "poor_reaction": "Nếu PG nói chị xem sai rồi: Nhân vật thấy bị trách và phản ứng khó chịu.",
+  "behaviors": [
+   "Đối chiếu mốc hiệu lực.",
+   "Giải thích không quy lỗi.",
+   "Kiểm tra giá/chương trình hiện hành thay vì bịa ưu đãi."
+  ],
+  "critical_error": "Tự kéo dài chương trình hoặc nói khách không biết đọc."
+ },
+ {
+  "code": "KM07",
+  "title": "Hai ưu đãi không được cộng gộp",
+  "group": "promotion",
+  "group_label": "Khuyến mãi & SKU",
+  "difficulty": 2,
+  "competencies": [
+   "c3",
+   "c5"
+  ],
+  "context": "Khách muốn vừa giảm trực tiếp vừa nhận quà từ hai chương trình riêng.",
+  "pg_data": "Thể lệ giả định: cùng mã sản phẩm đủ điều kiện được chọn giảm 10.000đ HOẶC nhận quà Q; không kết hợp. Không có giá trị quy đổi tiền của Q.",
+  "opening": "Chị mua đủ rồi thì phải vừa giảm tiền vừa có quà chứ?",
+  "hidden": [
+   {
+    "trigger": "ưu tiên",
+    "reveal": "khách thích giảm tiền hơn quà."
+   },
+   {
+    "trigger": "giải thích lựa chọn",
+    "reveal": "khách muốn biết giá trị tiền thực tế của từng phương án được phép."
+   }
+  ],
+  "good_reaction": "Nếu PG nêu rõ không cộng gộp và hỏi khách chọn ưu đãi nào, khách chọn giảm tiền.",
+  "poor_reaction": "Nếu PG tự thêm quà cho êm chuyện: Nhân vật đòi xác nhận trên hóa đơn.",
+  "behaviors": [
+   "Đọc đúng điều khoản.",
+   "Trình bày hai lựa chọn có thật.",
+   "Để khách chọn dựa trên ưu tiên."
+  ],
+  "critical_error": "Hứa cộng gộp ngoài thể lệ hoặc tự định giá tiền mặt của quà."
+ },
+ {
+  "code": "KM08",
+  "title": "Không tìm thấy chai dung tích quen dùng",
+  "group": "promotion",
+  "group_label": "Khuyến mãi & SKU",
+  "difficulty": 2,
+  "competencies": [
+   "c2",
+   "c3",
+   "c5"
+  ],
+  "context": "Khách tìm chai nước mắm dung tích cũ; kệ chỉ có dung tích khác.",
+  "pg_data": "500 ml là dung tích giả định trong tình huống; chưa có xác nhận ngừng kinh doanh, tồn kho hoặc mã sản phẩm thay thế.",
+  "opening": "Chai 500 ml chị hay mua đâu, giờ chỉ còn chai lớn vậy?",
+  "hidden": [
+   {
+    "trigger": "nhu cầu",
+    "reveal": "khách cần chai gọn để trên bàn ăn."
+   },
+   {
+    "trigger": "lý do chọn cũ",
+    "reveal": "không muốn trữ nhiều."
+   }
+  ],
+  "good_reaction": "Nếu PG kiểm tra tình trạng mã cũ và hỏi nhu cầu sử dụng, khách sẵn sàng xem lựa chọn phù hợp nếu có.",
+  "poor_reaction": "Nếu PG nói hãng bỏ mã rồi dù chưa kiểm tra: Khách hỏi thông báo ở đâu.",
+  "behaviors": [
+   "Hỏi lý do chọn dung tích.",
+   "Xác minh mã/tồn.",
+   "So sánh lựa chọn có thật, không tự kết luận cắt mã."
+  ],
+  "critical_error": "Suy từ hết kệ thành ngừng bán/cắt mã hoặc ép mua dung tích lớn."
+ },
+ {
+  "code": "KM09",
+  "title": "Pack cà phê mới nhìn lớn nhưng ít gói hơn",
+  "group": "promotion",
+  "group_label": "Khuyến mãi & SKU",
+  "difficulty": 2,
+  "competencies": [
+   "c2",
+   "c3",
+   "c5"
+  ],
+  "context": "Khách so sánh hai pack cà phê và cảm thấy bao bì mới gây hiểu nhầm.",
+  "pg_data": "Giả định A: 20 gói x 16g, 64.000đ; B: 18 gói x 20g, 72.000đ. Cùng 20.000đ/100g; giá/gói khác. Chưa cấp dữ liệu công thức.",
+  "opening": "Hộp nhìn to hơn mà ít gói hơn, tính ra có đắt hơn không?",
+  "hidden": [
+   {
+    "trigger": "mục đích",
+    "reveal": "khách muốn so chi phí trên lượng thực dùng."
+   },
+   {
+    "trigger": "giả định công thức",
+    "reveal": "khách chưa biết hai pack có cùng thành phần hay không."
+   }
+  ],
+  "good_reaction": "Nếu PG tính trên tổng khối lượng rồi nêu giới hạn chưa biết công thức, khách đồng ý xem nhãn trước khi chọn.",
+  "poor_reaction": "Nếu PG chỉ so số gói: Nhưng mỗi gói có nặng bằng nhau đâu em?",
+  "behaviors": [
+   "Đối chiếu số gói và khối lượng mỗi gói.",
+   "Tính đúng giá/100g.",
+   "Không suy chất lượng từ kích thước hộp."
+  ],
+  "critical_error": "Khẳng định công thức không đổi hoặc so đơn vị sai."
+ },
+ {
+  "code": "KM10",
+  "title": "SKU thay thế có nhãn chưa xác minh về dị ứng",
+  "group": "promotion",
+  "group_label": "Khuyến mãi & SKU",
+  "difficulty": 3,
+  "competencies": [
+   "c2",
+   "c3",
+   "c5"
+  ],
+  "context": "Khách tìm sản phẩm cũ không có trên kệ và nói người dùng cần tránh một thành phần gây dị ứng.",
+  "pg_data": "Không cấp nhãn sản phẩm; kết thúc đúng có thể là chưa bán. Không tư vấn y khoa hoặc thử phản ứng dị ứng.",
+  "opening": "Loại cũ không có thì em lấy loại giống vậy, nhưng nhà chị có người dị ứng đậu nành.",
+  "hidden": [
+   {
+    "trigger": "điều khách cần",
+    "reveal": "muốn xem thông tin thành phần/cảnh báo đúng sản phẩm thay thế."
+   },
+   {
+    "trigger": "chưa xác minh được",
+    "reveal": "khách chấp nhận không mua."
+   }
+  ],
+  "good_reaction": "Nếu PG ưu tiên kiểm tra nhãn và không bảo đảm thay thế khi thiếu thông tin, khách đồng ý tìm nguồn xác thực.",
+  "poor_reaction": "Nếu PG nói cùng thương hiệu nên chắc giống: Khách hỏi em đã đọc nhãn chưa.",
+  "behaviors": [
+   "Nhận diện giới hạn tư vấn.",
+   "Không thay thế dựa vào thương hiệu/bao bì.",
+   "Dừng đề xuất khi chưa xác minh được thông tin liên quan."
+  ],
+  "critical_error": "Bảo đảm không có chất gây dị ứng khi không có nhãn xác thực, hoặc gợi ý dùng thử để kiểm tra phản ứng."
+ },
+ {
+  "code": "BH01",
+  "title": "Sinh viên mua bữa tối với ngân sách cố định",
+  "group": "full_sale",
+  "group_label": "5 bước bán hàng",
+  "difficulty": 1,
+  "competencies": [
+   "c1",
+   "c2",
+   "c3",
+   "c4"
+  ],
+  "context": "Khách đi một mình, xem quầy mì; PG chủ động bắt đầu cuộc tư vấn đầy đủ.",
+  "pg_data": "Giá giả định: mì A 10.000đ/gói, tương ớt B 18.000đ/chai. Không coi việc không bán thêm là thất bại C4.",
+  "opening": "Em muốn ăn tối nhanh, có gì vừa tiền không chị?",
+  "hidden": [
+   {
+    "trigger": "ngân sách",
+    "reveal": "tối đa 30.000đ cho các món ở quầy này."
+   },
+   {
+    "trigger": "đồ sẵn có",
+    "reveal": "khách đã có tương ớt ở phòng."
+   },
+   {
+    "trigger": "dụng cụ",
+    "reveal": "có bếp và nồi."
+   }
+  ],
+  "good_reaction": "Nếu PG hỏi đủ ràng buộc và không gợi ý mua tương ớt trùng nhu cầu, khách chọn số lượng đủ ăn và xác nhận tổng tiền.",
+  "poor_reaction": "Nếu PG ép thêm combo: Em đã có tương ớt rồi, mua thêm làm gì?",
+  "behaviors": [
+   "Mở lời phù hợp.",
+   "Hỏi ngân sách/đồ sẵn có.",
+   "Đề xuất chính và chỉ bổ trợ nếu cần.",
+   "Xác nhận số lượng và tổng chi."
+  ],
+  "critical_error": "Vượt ngân sách khi chưa được khách đồng ý hoặc gán lợi ích dinh dưỡng không có dữ liệu."
+ },
+ {
+  "code": "BH02",
+  "title": "Bữa ăn có trẻ không ăn cay và người lớn thích cay",
+  "group": "full_sale",
+  "group_label": "5 bước bán hàng",
+  "difficulty": 2,
+  "competencies": [
+   "c1",
+   "c2",
+   "c3",
+   "c4"
+  ],
+  "context": "Khách mua gia vị cho bữa gia đình có người ăn cay và người không ăn cay.",
+  "pg_data": "Không có dữ liệu độ tuổi phù hợp hay độ cay cụ thể của mã sản phẩm; không đưa khuyến cáo dinh dưỡng cho trẻ.",
+  "opening": "Nhà chị mỗi người một ý, mua sao cho đỡ phải nấu hai nồi?",
+  "hidden": [
+   {
+    "trigger": "số người",
+    "reveal": "hai người lớn và một trẻ nhỏ."
+   },
+   {
+    "trigger": "đồ có sẵn",
+    "reveal": "gia vị nêm cơ bản còn, tương ớt hết."
+   },
+   {
+    "trigger": "cách ăn",
+    "reveal": "người lớn có thể dùng gia vị chấm riêng."
+   }
+  ],
+  "good_reaction": "Nếu PG đề xuất cách phục vụ tách phần cay và kiểm tra nhãn phù hợp, khách cân nhắc chỉ mua thứ đang thiếu.",
+  "poor_reaction": "Nếu PG nói cứ cho cay nhẹ ai cũng ăn được: Con chị không ăn cay được mà.",
+  "behaviors": [
+   "Khám phá khác biệt nhu cầu.",
+   "Không đánh đồng cả gia đình.",
+   "Đề xuất bổ trợ thật sự còn thiếu.",
+   "Chốt lại cách sử dụng ở mức thông tin nhãn cho phép."
+  ],
+  "critical_error": "Cam kết sản phẩm phù hợp mọi trẻ em hoặc bỏ qua nhu cầu không ăn cay."
+ },
+ {
+  "code": "BH03",
+  "title": "Người mới nấu món kho lần đầu",
+  "group": "full_sale",
+  "group_label": "5 bước bán hàng",
+  "difficulty": 1,
+  "competencies": [
+   "c1",
+   "c2",
+   "c3",
+   "c4"
+  ],
+  "context": "Khách nhìn nhiều loại gia vị và chưa biết cần mua gì cho món kho.",
+  "pg_data": "Không cung cấp công thức định lượng; có thể đề nghị tra công thức chính thức, không giả vờ đã tra.",
+  "opening": "Em mới tập nấu, nhìn chai nào cũng không biết chọn.",
+  "hidden": [
+   {
+    "trigger": "món",
+    "reveal": "dự định kho thịt."
+   },
+   {
+    "trigger": "đồ có sẵn",
+    "reveal": "đã có nước mắm và đường, chưa biết nên dùng bao nhiêu."
+   },
+   {
+    "trigger": "nhu cầu mua",
+    "reveal": "không muốn mua cả bộ gia vị."
+   }
+  ],
+  "good_reaction": "Nếu PG xác nhận đồ sẵn có và hướng xem hướng dẫn/công thức được duyệt, khách chọn một thứ còn thiếu nếu thực sự cần.",
+  "poor_reaction": "Nếu PG lập tức lấy cả combo: Em mua hết chắc dùng không hết đâu.",
+  "behaviors": [
+   "Hỏi món và nguyên liệu sẵn.",
+   "Giải thích lựa chọn dễ hiểu.",
+   "Chỉ gợi ý bổ trợ theo thiếu hụt.",
+   "Kiểm tra khách hiểu và đồng ý."
+  ],
+  "critical_error": "Bịa công thức/liều lượng rồi bảo đảm thành công hoặc bán trùng đồ khách đã có."
+ },
+ {
+  "code": "BH04",
+  "title": "Mua bữa ăn đem theo nơi không có bếp",
+  "group": "full_sale",
+  "group_label": "5 bước bán hàng",
+  "difficulty": 2,
+  "competencies": [
+   "c1",
+   "c2",
+   "c3",
+   "c4"
+  ],
+  "context": "Khách muốn mua đồ dùng cho chuyến đi ngắn và đang đứng quầy mì.",
+  "pg_data": "Không có mã sản phẩm ăn liền không cần chế biến được cung cấp; không tự bịa danh mục tại cửa hàng.",
+  "opening": "Mai đi chơi cả ngày, chị mua gì đem theo cho tiện?",
+  "hidden": [
+   {
+    "trigger": "điều kiện sử dụng",
+    "reveal": "điểm đến không có bếp, chưa chắc có nước nóng."
+   },
+   {
+    "trigger": "vận chuyển",
+    "reveal": "mang ba lô, không có thùng giữ lạnh."
+   },
+   {
+    "trigger": "số người",
+    "reveal": "hai người."
+   }
+  ],
+  "good_reaction": "Nếu PG hỏi điều kiện trước và nhận ra mì cần chế biến không phù hợp khi thiếu nước nóng, khách đánh giá tư vấn hữu ích dù chưa mua.",
+  "poor_reaction": "Nếu PG chốt mì ngay: Tới đó không có nước nóng thì chị ăn sao?",
+  "behaviors": [
+   "Hỏi điều kiện sử dụng.",
+   "Đối chiếu yêu cầu trên nhãn.",
+   "Không cố bán sản phẩm không phù hợp.",
+   "Chốt bước kiểm tra lựa chọn thay thế."
+  ],
+  "critical_error": "Đề xuất cách dùng trái hướng dẫn hoặc bỏ qua điều kiện chế biến/bảo quản."
+ },
+ {
+  "code": "BH05",
+  "title": "Mua cho nhóm văn phòng có nhiều khẩu vị",
+  "group": "full_sale",
+  "group_label": "5 bước bán hàng",
+  "difficulty": 2,
+  "competencies": [
+   "c1",
+   "c2",
+   "c3",
+   "c4"
+  ],
+  "context": "Khách được giao mua đồ cho nhóm, chưa hỏi kỹ sở thích từng người.",
+  "pg_data": "Không cấp giá hoặc mã sản phẩm dạng ly cụ thể; PG phải kiểm tra thay vì tự tính tổng bằng giá bịa.",
+  "opening": "Chị mua cho sáu người ở văn phòng, lấy đại một loại được không?",
+  "hidden": [
+   {
+    "trigger": "khẩu vị",
+    "reveal": "biết hai người không thích cay, còn lại chưa rõ."
+   },
+   {
+    "trigger": "ngân sách",
+    "reveal": "tối đa 90.000đ."
+   },
+   {
+    "trigger": "chế biến",
+    "reveal": "có nước nóng nhưng không có bếp."
+   }
+  ],
+  "good_reaction": "Nếu PG hỏi các điều kiện thiết yếu rồi đề xuất kiểm tra dạng dùng phù hợp, khách gọi nhóm xác nhận trước khi chốt.",
+  "poor_reaction": "Nếu PG lấy cùng vị cay cho cả nhóm: Hai người kia không ăn được thì sao?",
+  "behaviors": [
+   "Khám phá khác biệt nhóm và điều kiện dùng.",
+   "Đề xuất kiểm tra mã sản phẩm phù hợp.",
+   "Gợi ý bổ trợ chỉ sau món chính.",
+   "Xác nhận số lượng/chi."
+  ],
+  "critical_error": "Khẳng định khẩu vị nào cũng hợp mọi người hoặc gán công dụng chưa có nhãn."
+ },
+ {
+  "code": "BH06",
+  "title": "Mua tích trữ nhưng không có nhiều chỗ cất",
+  "group": "full_sale",
+  "group_label": "5 bước bán hàng",
+  "difficulty": 2,
+  "competencies": [
+   "c1",
+   "c2",
+   "c3",
+   "c4"
+  ],
+  "context": "Khách phân vân giữa pack lớn và gói lẻ vì thấy giá/đơn vị pack lớn có vẻ lợi.",
+  "pg_data": "Giả định gói lẻ 10.000đ; pack 10 gói 95.000đ. Chưa biết hạn dùng; kiểm tra trước khi khuyên tích trữ.",
+  "opening": "Mua lớn thì rẻ hơn, nhưng nhà chị chật quá.",
+  "hidden": [
+   {
+    "trigger": "tốc độ dùng",
+    "reveal": "chỉ dùng khoảng hai gói mỗi tuần."
+   },
+   {
+    "trigger": "chỗ cất",
+    "reveal": "tủ đã gần đầy."
+   },
+   {
+    "trigger": "ưu tiên",
+    "reveal": "gọn và không bỏ thừa quan trọng hơn tiết kiệm ít tiền."
+   }
+  ],
+  "good_reaction": "Nếu PG so tổng chi cùng tốc độ dùng và chỗ cất, khách chọn lượng vừa phải.",
+  "poor_reaction": "Nếu PG chỉ nhấn rẻ trên đơn vị: Rẻ mà không có chỗ để thì chị vẫn khó.",
+  "behaviors": [
+   "Hỏi tốc độ dùng và chỗ cất.",
+   "So giá theo đơn vị lẫn tổng chi.",
+   "Tư vấn lượng hợp lý.",
+   "Chốt món bổ trợ chỉ khi có nhu cầu."
+  ],
+  "critical_error": "Đánh đồng mua nhiều với có lợi hoặc bỏ qua hạn/bảo quản."
+ },
+ {
+  "code": "BH07",
+  "title": "Người đi mua hộ không biết đúng sản phẩm",
+  "group": "full_sale",
+  "group_label": "5 bước bán hàng",
+  "difficulty": 2,
+  "competencies": [
+   "c1",
+   "c2",
+   "c3",
+   "c4"
+  ],
+  "context": "Khách có lời nhắn mua nước mắm nhưng không nhớ mã, không có ảnh ngay.",
+  "pg_data": "Khi PG đề nghị xác minh, phản hồi giả định từ người ở nhà: cần mã A 500ml. Tồn/giá A vẫn phải kiểm tra.",
+  "opening": "Vợ anh dặn mua chai màu đỏ, em lấy giúp chai nào giống vậy đi.",
+  "hidden": [
+   {
+    "trigger": "thêm",
+    "reveal": "người ở nhà muốn đúng loại quen dùng."
+   },
+   {
+    "trigger": "khả năng xác minh",
+    "reveal": "khách có thể gọi hoặc nhắn xin ảnh."
+   },
+   {
+    "trigger": "ngân sách",
+    "reveal": "chưa có chỉ dẫn."
+   }
+  ],
+  "good_reaction": "Nếu PG xin xác minh mã/dung tích trước, khách gửi tin nhắn hỏi lại; AI chỉ cung cấp thông tin sau hành động đó.",
+  "poor_reaction": "Nếu PG chọn theo màu nắp: Nhỡ không đúng loại thì anh lại phải quay lại.",
+  "behaviors": [
+   "Chào và làm rõ thông tin thiếu.",
+   "Đề nghị xác minh nhanh.",
+   "Không chốt khi chưa rõ đúng sản phẩm.",
+   "Không cố bán kèm trong lúc nhu cầu chính chưa xác định."
+  ],
+  "critical_error": "Khẳng định nhận diện mã sản phẩm chỉ bằng mô tả màu mơ hồ."
+ },
+ {
+  "code": "BH08",
+  "title": "Khách lớn tuổi khó đọc nhãn chữ nhỏ",
+  "group": "full_sale",
+  "group_label": "5 bước bán hàng",
+  "difficulty": 2,
+  "competencies": [
+   "c1",
+   "c2",
+   "c3",
+   "c4"
+  ],
+  "context": "Khách cầm chai xa mắt để đọc; PG cần hỗ trợ mà không khiến khách thấy bị coi thường.",
+  "pg_data": "Nhãn giả định cấp cho PG: mã A dung tích 300ml, hạn 30/06/2027; ngày phiên 01/10/2026. Không có công dụng sức khỏe được cung cấp.",
+  "opening": "Chữ nhỏ quá cô đọc không rõ, con xem giúp cô với.",
+  "hidden": [
+   {
+    "trigger": "nội dung cần đọc",
+    "reveal": "muốn biết dung tích và hạn dùng."
+   },
+   {
+    "trigger": "nhu cầu",
+    "reveal": "mua chai nhỏ, dễ cầm."
+   },
+   {
+    "trigger": "có cần thêm",
+    "reveal": "khách chỉ muốn mua một chai."
+   }
+  ],
+  "good_reaction": "Nếu PG xin phép đọc rõ đúng thông tin và hỏi lại lựa chọn, khách cảm thấy được tôn trọng.",
+  "poor_reaction": "Nếu PG nói cô lớn tuổi không hiểu đâu: Khách ngừng nhận hỗ trợ.",
+  "behaviors": [
+   "Xin phép hỗ trợ.",
+   "Đọc đúng trường thông tin có nguồn.",
+   "Kiểm tra khách hiểu.",
+   "Tôn trọng lựa chọn một món và xác nhận trước chốt."
+  ],
+  "critical_error": "Suy đoán bệnh lý/khả năng của khách hoặc che thông tin trên nhãn."
+ },
+ {
+  "code": "BH09",
+  "title": "Khách đổi ý sau khi đã đồng ý sản phẩm chính",
+  "group": "full_sale",
+  "group_label": "5 bước bán hàng",
+  "difficulty": 3,
+  "competencies": [
+   "c1",
+   "c2",
+   "c4",
+   "c5"
+  ],
+  "context": "Khách vừa đồng ý một sản phẩm, nhưng khi PG gợi ý món kèm thì muốn bỏ cả giỏ.",
+  "pg_data": "Giả định chai A bán riêng 30.000đ; món B 20.000đ; không có điều kiện mua kèm và không có giảm giá combo.",
+  "opening": "Thôi chị không lấy nữa, nghe em nói thành ra tốn nhiều quá.",
+  "hidden": [
+   {
+    "trigger": "lại điều khiến khách đổi ý",
+    "reveal": "tưởng phải mua combo mới được giá đã nói."
+   },
+   {
+    "trigger": "nhu cầu ban đầu",
+    "reveal": "vẫn cần một chai nước mắm."
+   },
+   {
+    "trigger": "được làm rõ",
+    "reveal": "có thể mua riêng."
+   }
+  ],
+  "good_reaction": "Nếu PG xin lỗi vì diễn đạt chưa rõ và xác nhận mua riêng được, khách quay lại cân nhắc món chính.",
+  "poor_reaction": "Nếu PG cố bảo combo tiết kiệm hơn: Chị đã nói không muốn chi thêm.",
+  "behaviors": [
+   "Dừng bán thêm.",
+   "Làm rõ hiểu nhầm.",
+   "Khôi phục quyền lựa chọn.",
+   "Xác nhận món chính/giá riêng trước khi chốt."
+  ],
+  "critical_error": "Tạo cảm giác bắt buộc mua thêm hoặc giữ món trong giỏ khi khách yêu cầu bỏ."
+ },
+ {
+  "code": "BH10",
+  "title": "Khách hỏi quầy nhưng thực ra chưa định mua hôm nay",
+  "group": "full_sale",
+  "group_label": "5 bước bán hàng",
+  "difficulty": 3,
+  "competencies": [
+   "c1",
+   "c2",
+   "c3",
+   "c4"
+  ],
+  "context": "Khách hỏi nhiều loại gia vị cho bữa tiệc tuần tới. PG cần xác định giai đoạn mua.",
+  "pg_data": "Không biết giá, tồn hoặc chương trình tuần sau. Không tự thêm người hay món vào kế hoạch tiệc của khách.",
+  "opening": "Chị mới xem trước thôi, tuần sau nhà có tiệc.",
+  "hidden": [
+   {
+    "trigger": "quy mô/món",
+    "reveal": "khoảng tám người, thực đơn chưa chốt."
+   },
+   {
+    "trigger": "thời điểm quyết định",
+    "reveal": "cần bàn lại với người nhà."
+   },
+   {
+    "trigger": "thông tin cần",
+    "reveal": "muốn biết cách tìm đúng sản phẩm khi quay lại."
+   }
+  ],
+  "good_reaction": "Nếu PG giúp lập tiêu chí chọn và giới thiệu nguồn thông tin kiểm tra sau, khách đồng ý ghi tên/mã sản phẩm đã xác minh.",
+  "poor_reaction": "Nếu PG thúc mua ngay kẻo hết: Chị chưa chốt món, mua giờ lại dư.",
+  "behaviors": [
+   "Xác định khách đang tham khảo.",
+   "Khai thác kế hoạch vừa đủ.",
+   "Gợi ý theo nhu cầu dự kiến có điều kiện.",
+   "Chốt bước tiếp theo không ép giao dịch."
+  ],
+  "critical_error": "Tạo khan hiếm giả hoặc hứa giá/khuyến mãi tuần sau không có căn cứ."
+ }
+]

@@ -1,116 +1,58 @@
----
-# Secret
-apiVersion: v1
-kind: Secret
-metadata:
-  name: postgres-secret
-  namespace: pgnexus
-type: Opaque
-stringData:
-  POSTGRES_USER: pgnexus
-  POSTGRES_PASSWORD: pgnexus_pass
-  POSTGRES_DB: pgnexus
----
-# ConfigMap for init SQL
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: postgres-init
-  namespace: pgnexus
-data:
-  init.sql: |
-    CREATE DATABASE pgnexus;
-    \c pgnexus
-    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
----
-# PersistentVolumeClaim
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: postgres-pvc
-  namespace: pgnexus
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
----
-# StatefulSet
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: postgres
-  namespace: pgnexus
-  labels:
-    app: postgres
-spec:
-  serviceName: postgres
-  replicas: 1
-  selector:
-    matchLabels:
-      app: postgres
-  template:
-    metadata:
-      labels:
-        app: postgres
-    spec:
-      containers:
-        - name: postgres
-          image: postgres:16-alpine
-          env:
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_USER
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_PASSWORD
-            - name: POSTGRES_DB
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_DB
-          ports:
-            - containerPort: 5432
-          readinessProbe:
-            exec:
-              command: ["pg_isready", "-U", "pgnexus"]
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            exec:
-              command: ["pg_isready", "-U", "pgnexus"]
-            initialDelaySeconds: 30
-            periodSeconds: 20
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-            limits:
-              memory: "1Gi"
-              cpu: "500m"
-          volumeMounts:
-            - name: postgres-storage
-              mountPath: /var/lib/postgresql/data
-      volumes:
-        - name: postgres-storage
-          persistentVolumeClaim:
-            claimName: postgres-pvc
----
-# Service
 apiVersion: v1
 kind: Service
 metadata:
   name: postgres
-  namespace: pgnexus
 spec:
+  clusterIP: None
+  selector: { app: postgres }
+  ports: [{ port: 5432, targetPort: 5432 }]
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  serviceName: postgres
+  replicas: 1
   selector:
-    app: postgres
-  ports:
-    - port: 5432
-      targetPort: 5432
-  clusterIP: None  # Headless for StatefulSet
+    matchLabels: { app: postgres }
+  template:
+    metadata:
+      labels: { app: postgres }
+    spec:
+      # local-path volumes live on one node; keep the database with its data
+      nodeSelector: { kubernetes.io/hostname: fedora-1 }
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          env:
+            - { name: POSTGRES_USER, value: pgnexus }
+            - { name: POSTGRES_DB, value: pgnexus }
+            - name: POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: pgnexus-secrets, key: POSTGRES_PASSWORD } }
+            - { name: PGDATA, value: /var/lib/postgresql/data/pgdata }
+          ports: [{ containerPort: 5432 }]
+          readinessProbe:
+            exec: { command: ["pg_isready", "-U", "pgnexus"] }
+            periodSeconds: 10
+          livenessProbe:
+            exec: { command: ["pg_isready", "-U", "pgnexus"] }
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { memory: 1Gi }
+          volumeMounts:
+            - { name: data, mountPath: /var/lib/postgresql/data }
+            - { name: init, mountPath: /docker-entrypoint-initdb.d, readOnly: true }
+      volumes:
+        - name: init
+          configMap: { name: postgres-init }
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        storageClassName: local-path
+        resources:
+          requests: { storage: 10Gi }

@@ -1,0 +1,25 @@
+# Production on the k3s cluster (fedora control plane + fedora-1 worker), synced by Argo CD.
+# CI updates the image tags below on every push to main.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+configMapGenerator:
+  - name: pgnexus-config
+    literals:
+      - APP_URL=https://masan-lms.sentpul.click
+      - KEYCLOAK_PUBLIC_URL=https://masan-lms.sentpul.click/auth
+      - KEYCLOAK_ISSUER=https://masan-lms.sentpul.click/auth/realms/pgnexus
+patches:
+  - target: { kind: Ingress, name: pgnexus }
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: masan-lms.sentpul.click
+images:
+  - name: pgnexus-backend
+    newName: ghcr.io/khaidao2/m-web-backend
+    newTag: latest
+  - name: pgnexus-frontend
+    newName: ghcr.io/khaidao2/m-web-frontend
+    newTag: latest

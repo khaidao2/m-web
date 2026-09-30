@@ -1,0 +1,7 @@
+# /etc/cloudflared/config.yml on fedora-1 — tunnel "masan_lms" → Traefik on the node.
+tunnel: 713ad92a-a8f4-4aec-812c-91ab687e037e
+credentials-file: /etc/cloudflared/713ad92a-a8f4-4aec-812c-91ab687e037e.json
+ingress:
+  - hostname: masan-lms.sentpul.click
+    service: http://localhost:80
+  - service: http_status:404

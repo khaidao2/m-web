@@ -1,389 +1,272 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
-import { getToken } from '@/lib/auth'
+import { use, useCallback, useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { Check, Circle, Clock, Diamond, Flame, Mic, RotateCcw, Square, Triangle, X, type LucideIcon } from 'lucide-react'
+import { NamedIcon } from '@/components/icons'
+import { ErrorBox, Loading } from '@/components/ui'
 import { api } from '@/lib/api'
-import toast from 'react-hot-toast'
+import type { Me } from '@/lib/types'
 
-const COLORS = [
-  { bg: '#C8102E', light: '#FF2D55', icon: '🔴' },
-  { bg: '#0047AB', light: '#1E90FF', icon: '🔵' },
-  { bg: '#FFB800', light: '#FFD700', icon: '🟡', dark: true },
-  { bg: '#137333', light: '#22C55E', icon: '🟢' },
-]
-
-interface Question {
+type Question = {
   id: string
-  text: string
-  image_url?: string
-  options: { id: string; text: string }[]
+  category: string
+  prompt: string
+  options: string[]
+  visual: { icon: string; tone: string; label: string }
+  answered?: { choice: number | null; correct: boolean; points: number }
+  answer?: number
+  explain?: string
 }
-interface Quiz {
-  id: string
-  title: string
+type Result = { correct: number; total: number; points: number; leaderboard_points: number; percent: number; by_category: Record<string, { correct: number; total: number }> }
+type Attempt = {
+  attempt_id: string
+  started_at: string
+  time_limit_seconds: number
+  question_seconds: number
+  categories: Record<string, { label: string }>
+  note: string
   questions: Question[]
+  result: Result | null
 }
-interface Attempt { id: string }
+type Feedback = { correct: boolean; answer: number; explain: string; points: number; streak: number; choice: number | null }
 
-type Phase = 'loading' | 'countdown' | 'question' | 'reveal' | 'result'
+const TILES: { color: string; shape: LucideIcon }[] = [
+  { color: '#e21b3c', shape: Triangle },
+  { color: '#1368ce', shape: Diamond },
+  { color: '#d89e00', shape: Circle },
+  { color: '#26890c', shape: Square },
+]
+const TONES: Record<string, string> = { red: '#d71920', amber: '#e08a00', blue: '#2f6fed', green: '#12a150', brown: '#7a4a24' }
 
-export default function QuizPage() {
-  const { id } = useParams<{ id: string }>()
-  const router  = useRouter()
-  const token   = getToken()!
-
-  const [quiz, setQuiz]         = useState<Quiz | null>(null)
-  const [attempt, setAttempt]   = useState<Attempt | null>(null)
-  const [phase, setPhase]       = useState<Phase>('loading')
-  const [qIdx, setQIdx]         = useState(0)
-  const [timeLeft, setTimeLeft] = useState(30)
-  const [selected, setSelected] = useState<string | null>(null)
-  const [correct, setCorrect]   = useState<string | null>(null)
-  const [answers, setAnswers]   = useState<{ question_id: string; option_id: string }[]>([])
-  const [score, setScore]       = useState<number>(0)
-  const [flash, setFlash]       = useState<'correct' | 'wrong' | null>(null)
-  const [confetti, setConfetti] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+export default function QuizGame({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  const router = useRouter()
+  const [attempt, setAttempt] = useState<Attempt | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [index, setIndex] = useState(0)
+  const [feedback, setFeedback] = useState<Feedback | null>(null)
+  const [score, setScore] = useState(0)
+  const [result, setResult] = useState<Result | null>(null)
+  const [now, setNow] = useState(() => Date.now())
+  const [qStart, setQStart] = useState(() => Date.now())
+  const [me, setMe] = useState<Me | null>(null)
+  const sending = useRef(false)
 
   useEffect(() => {
-    Promise.all([api.quiz(id, token), api.startQuiz(id, token)])
-      .then(([q, a]) => { setQuiz(q); setAttempt(a); setPhase('countdown') })
-      .catch(() => { toast.error('Không thể tải bài kiểm tra'); router.back() })
+    api<Attempt>(`/quiz/${id}`)
+      .then((a) => {
+        setAttempt(a)
+        setResult(a.result)
+        const first = a.questions.findIndex((q) => !q.answered)
+        setIndex(first === -1 ? a.questions.length : first)
+        setScore(a.questions.reduce((s, q) => s + (q.answered?.points ?? 0), 0))
+        setQStart(Date.now())
+      })
+      .catch((e) => setError(e.message))
+    api<Me>('/me').then(setMe).catch(() => {})
   }, [id])
 
-  // Countdown before first question
   useEffect(() => {
-    if (phase !== 'countdown') return
-    const t = setTimeout(() => {
-      setTimeLeft(30)
-      setPhase('question')
-    }, 1500)
-    return () => clearTimeout(t)
-  }, [phase])
+    const t = setInterval(() => setNow(Date.now()), 250)
+    return () => clearInterval(t)
+  }, [])
 
-  // Per-question timer
-  useEffect(() => {
-    if (phase !== 'question') return
-    timerRef.current = setInterval(() => {
-      setTimeLeft(t => {
-        if (t <= 1) { autoAdvance(); return 0 }
-        return t - 1
-      })
-    }, 1000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [phase, qIdx])
-
-  function autoAdvance() {
-    if (timerRef.current) clearInterval(timerRef.current)
-    setSelected(null)
-    setCorrect(null)
-    advanceQuestion()
-  }
-
-  function handleSelect(optionId: string) {
-    if (selected || phase !== 'question') return
-    if (timerRef.current) clearInterval(timerRef.current)
-
-    const q = quiz!.questions[qIdx]
-    setSelected(optionId)
-    // For demo — in real app, correct comes from reveal endpoint
-    setCorrect(q.options[0].id)
-    const isCorrect = optionId === q.options[0].id
-
-    setFlash(isCorrect ? 'correct' : 'wrong')
-    setTimeout(() => setFlash(null), 600)
-
-    if (isCorrect) setScore(s => s + 1)
-    setAnswers(prev => [...prev, { question_id: q.id, option_id: optionId }])
-    setPhase('reveal')
-    setTimeout(() => {
-      setPhase('question')
-      advanceQuestion()
-    }, 1800)
-  }
-
-  function advanceQuestion() {
-    if (!quiz) return
-    if (qIdx + 1 >= quiz.questions.length) {
-      finishQuiz()
-    } else {
-      setQIdx(i => i + 1)
-      setSelected(null)
-      setCorrect(null)
-      setTimeLeft(30)
-    }
-  }
-
-  async function finishQuiz() {
-    if (!attempt) return
-    setPhase('result')
-    setConfetti(true)
+  const finish = useCallback(async () => {
+    if (sending.current) return
+    sending.current = true
     try {
-      await api.submitQuiz(attempt.id, answers, token)
-    } catch {}
-  }
+      setResult(await api<Result>(`/quiz/${id}/finish`, { method: 'POST' }))
+      api<Me>('/me').then(setMe).catch(() => {})
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Không nộp được bài')
+    } finally {
+      sending.current = false
+    }
+  }, [id])
 
-  if (!quiz || phase === 'loading') {
-    return (
-      <div style={{
-        minHeight: '100dvh', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center', background: '#0A0A0F', gap: 16,
-      }}>
-        <div style={{
-          width: 48, height: 48, border: '3px solid rgba(255,255,255,0.1)',
-          borderTopColor: '#C8102E', borderRadius: '50%', animation: 'spin 0.8s linear infinite',
-        }} />
-        <p style={{ color: 'rgba(255,255,255,0.5)' }}>Đang tải bài kiểm tra...</p>
-      </div>
-    )
-  }
+  const choose = useCallback(async (choice: number | null) => {
+    if (!attempt || feedback || sending.current) return
+    const q = attempt.questions[index]
+    sending.current = true
+    try {
+      const fb = await api<Omit<Feedback, 'choice'>>(`/quiz/${id}/answer`, {
+        method: 'POST', json: { question_id: q.id, choice, time_ms: Date.now() - qStart },
+      })
+      setFeedback({ ...fb, choice })
+      setScore((s) => s + fb.points)
+    } catch (e) {
+      // time is up on the server: close the attempt
+      sending.current = false
+      if (e instanceof Error && /hết|kết thúc/.test(e.message)) return finish()
+      setError(e instanceof Error ? e.message : 'Lỗi gửi câu trả lời')
+    }
+    sending.current = false
+  }, [attempt, feedback, finish, id, index, qStart])
 
-  if (phase === 'result') {
-    const total = quiz.questions.length
-    const pct = Math.round((score / total) * 100)
-    return (
-      <div style={{
-        minHeight: '100dvh',
-        background: 'linear-gradient(160deg, #0A0A0F 0%, #1A0510 50%, #0A0A1A 100%)',
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center',
-        padding: 24, position: 'relative', overflow: 'hidden',
-      }}>
-        {/* Confetti particles */}
-        {confetti && Array.from({ length: 20 }).map((_, i) => (
-          <div key={i} style={{
-            position: 'absolute',
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            width: 8, height: 8,
-            background: ['#C8102E','#FFB800','#22C55E','#3B82F6','#FF2D55'][i % 5],
-            borderRadius: Math.random() > 0.5 ? '50%' : 0,
-            animation: `confetti ${1 + Math.random() * 2}s ${Math.random()}s forwards`,
-          }} />
-        ))}
+  const next = useCallback(() => {
+    if (!attempt) return
+    setFeedback(null)
+    setQStart(Date.now())
+    if (index + 1 >= attempt.questions.length) {
+      setIndex(attempt.questions.length)
+      void finish()
+    } else setIndex(index + 1)
+  }, [attempt, finish, index])
 
-        <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-          style={{ textAlign: 'center', zIndex: 1 }}
-        >
-          <div style={{ fontSize: '4rem', marginBottom: 16 }}>
-            {pct >= 80 ? '🎉' : pct >= 50 ? '👍' : '💪'}
-          </div>
-          <h1 style={{ color: 'white', fontSize: '2rem', fontWeight: 800, marginBottom: 8 }}>
-            {pct >= 80 ? 'Xuất Sắc!' : pct >= 50 ? 'Tốt lắm!' : 'Cố gắng hơn!'}
-          </h1>
+  // timers: `now` only drives the display; expiry is scheduled so state changes happen in callbacks
+  const totalLeft = attempt ? Math.max(0, attempt.time_limit_seconds - (now - Date.parse(attempt.started_at)) / 1000) : 0
+  const qLeft = attempt ? Math.max(0, attempt.question_seconds - (now - qStart) / 1000) : 0
+  useEffect(() => {
+    if (!attempt || result || index >= attempt.questions.length) return
+    const totalMs = Date.parse(attempt.started_at) + attempt.time_limit_seconds * 1000 - Date.now()
+    const questionMs = feedback ? Infinity : qStart + attempt.question_seconds * 1000 - Date.now()
+    const t = setTimeout(() => void (totalMs <= questionMs ? finish() : choose(null)), Math.max(0, Math.min(totalMs, questionMs)))
+    return () => clearTimeout(t)
+  }, [attempt, choose, feedback, finish, index, qStart, result])
+  useEffect(() => {
+    if (!feedback) return
+    const t = setTimeout(next, feedback.correct ? 1600 : 3200)
+    return () => clearTimeout(t)
+  }, [feedback, next])
 
-          <div style={{
-            background: 'rgba(255,255,255,0.06)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: 20, padding: '28px 40px',
-            marginBottom: 24,
-          }}>
-            <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.875rem', marginBottom: 8 }}>
-              Điểm số
-            </div>
-            <div style={{
-              fontSize: '3.5rem', fontWeight: 800,
-              background: 'linear-gradient(135deg, #FFB800, #FF8C00)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            }}>
-              {pct}%
-            </div>
-            <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.875rem', marginTop: 8 }}>
-              {score} / {total} câu đúng
-            </div>
-          </div>
+  if (error) return <main className="page"><ErrorBox error={error} retry={() => router.refresh()} /></main>
+  if (!attempt) return <Loading label="Đang chuẩn bị câu hỏi…" />
+  if (result) return <ResultView attempt={attempt} result={result} me={me} />
+  if (index >= attempt.questions.length) return <Loading label="Đang chấm điểm…" />
 
-          <button
-            className="btn btn-primary btn-full"
-            onClick={() => router.push('/hoc')}
-            style={{ marginBottom: 12 }}
-          >
-            🏠 Về trang chủ
-          </button>
-          <button className="btn btn-ghost btn-full" onClick={() => router.push('/hoc/leaderboard')}>
-            🏆 Xem bảng xếp hạng
-          </button>
-        </motion.div>
-      </div>
-    )
-  }
-
-  const q     = quiz.questions[qIdx]
-  const total = quiz.questions.length
-  const pct   = ((qIdx) / total) * 100
-  const timerPct = (timeLeft / 30) * 283
+  const q = attempt.questions[index]
+  const tone = TONES[q.visual.tone] ?? TONES.red
+  const mm = Math.floor(totalLeft / 60)
+  const ss = String(Math.floor(totalLeft % 60)).padStart(2, '0')
 
   return (
-    <div style={{
-      minHeight: '100dvh',
-      background: 'linear-gradient(160deg, #0A0008 0%, #160010 50%, #080A1A 100%)',
-      display: 'flex', flexDirection: 'column',
-      position: 'relative', overflow: 'hidden',
-    }}>
-      {/* Flash overlay */}
-      <AnimatePresence>
-        {flash && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 0.3 }} exit={{ opacity: 0 }}
-            style={{
-              position: 'absolute', inset: 0, zIndex: 50,
-              background: flash === 'correct' ? '#22C55E' : '#C8102E',
-              pointerEvents: 'none',
-            }}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Countdown phase overlay */}
-      <AnimatePresence>
-        {phase === 'countdown' && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            style={{
-              position: 'absolute', inset: 0, zIndex: 60,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'rgba(0,0,0,0.8)',
-            }}
-          >
-            <motion.div
-              initial={{ scale: 2, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              style={{ fontSize: '4rem', fontWeight: 800, color: 'white' }}
-            >
-              Sẵn Sàng! 🎯
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Progress bar */}
-      <div style={{ height: 4, background: 'rgba(255,255,255,0.1)', position: 'relative' }}>
-        <motion.div
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.4 }}
-          style={{
-            height: '100%',
-            background: 'linear-gradient(90deg, #C8102E, #FF2D55)',
-            position: 'absolute', left: 0, top: 0,
-          }}
-        />
+    <main className="page bare" style={{ paddingTop: 4 }}>
+      <div className="row between small" style={{ fontWeight: 700 }}>
+        <span>Câu {index + 1}/{attempt.questions.length}</span>
+        <span className="chip" style={{ color: totalLeft < 30 ? 'var(--red)' : undefined }}><Clock size={13} /> {mm}:{ss}</span>
+        <span className="chip dark">{score.toLocaleString('vi-VN')} điểm</span>
       </div>
+      <div className="bar" style={{ marginTop: 10 }}><i style={{ width: `${(index / attempt.questions.length) * 100}%` }} /></div>
 
-      {/* Header */}
-      <div style={{
-        padding: '16px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
-        <button
-          onClick={() => router.back()}
-          style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 10, padding: '8px 12px', color: 'white', cursor: 'pointer' }}
-        >
-          ✕
-        </button>
-        <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.875rem' }}>
-          Câu {qIdx + 1} / {total}
+      <section className="card pop" key={q.id} style={{ marginTop: 14, padding: 0, overflow: 'hidden' }}>
+        <div style={{ position: 'relative', height: 130, display: 'grid', placeItems: 'center', color: '#fff',
+          background: `radial-gradient(circle at 20% 20%, color-mix(in srgb, ${tone} 55%, white), ${tone} 75%)` }}>
+          <NamedIcon name={q.visual.icon} size={58} strokeWidth={1.6} />
+          <span className="chip" style={{ position: 'absolute', left: 12, top: 12, background: 'rgba(255,255,255,.2)', color: '#fff' }}>
+            {attempt.categories[q.category]?.label}
+          </span>
+          <span style={{ position: 'absolute', left: 12, bottom: 10, fontWeight: 700, fontSize: 13, opacity: 0.9 }}>{q.visual.label}</span>
+          <CountRing left={qLeft} total={attempt.question_seconds} />
         </div>
+        <h2 style={{ fontSize: 17.5, fontWeight: 700, lineHeight: 1.35, padding: 16 }}>{q.prompt}</h2>
+      </section>
 
-        {/* Timer ring */}
-        <div style={{ position: 'relative', width: 52, height: 52 }}>
-          <svg width="52" height="52" style={{ position: 'absolute', top: 0, left: 0, transform: 'rotate(-90deg)' }}>
-            <circle cx="26" cy="26" r="22" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="4" />
-            <circle
-              cx="26" cy="26" r="22" fill="none"
-              stroke={timeLeft <= 10 ? '#C8102E' : '#FFB800'}
-              strokeWidth="4"
-              strokeDasharray="138"
-              strokeDashoffset={138 - (timeLeft / 30) * 138}
-              strokeLinecap="round"
-              style={{ transition: 'stroke-dashoffset 1s linear, stroke 0.3s' }}
-            />
-          </svg>
-          <div style={{
-            position: 'absolute', inset: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: timeLeft <= 10 ? '#FF4060' : 'white',
-            fontWeight: 700, fontSize: '1rem',
-            transition: 'color 0.3s',
-          }}>
-            {timeLeft}
+      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 12 }}>
+        {q.options.map((opt, i) => {
+          const { color, shape: Shape } = TILES[i]
+          const isAnswer = feedback && feedback.answer === i
+          const dim = feedback && !isAnswer && feedback.choice !== i
+          return (
+            <button key={i} onClick={() => choose(i)} disabled={Boolean(feedback)}
+              style={{
+                minHeight: 92, borderRadius: 16, padding: 12, background: color, color: '#fff', textAlign: 'left',
+                display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 8, fontWeight: 600, fontSize: 14,
+                opacity: dim ? 0.35 : 1, boxShadow: isAnswer ? '0 0 0 4px #fff, 0 0 0 7px ' + color : '0 4px 0 rgba(0,0,0,.18)',
+                transition: 'opacity .2s, box-shadow .2s',
+              }}>
+              <span className="row between" style={{ width: '100%' }}>
+                <Shape size={20} fill="#fff" />
+                {isAnswer && <Check size={20} />}
+                {feedback && feedback.choice === i && !feedback.correct && <X size={20} />}
+              </span>
+              <span style={{ lineHeight: 1.3 }}>{opt}</span>
+            </button>
+          )
+        })}
+      </section>
+
+      {feedback && (
+        <section className="card pop" style={{ marginTop: 12, borderTop: `4px solid ${feedback.correct ? 'var(--green)' : 'var(--red)'}` }} onClick={next}>
+          <div className="row between">
+            <b style={{ color: feedback.correct ? 'var(--green)' : 'var(--red)', fontSize: 17 }}>
+              {feedback.choice === null ? 'Hết giờ!' : feedback.correct ? 'Chính xác!' : 'Chưa đúng'}
+            </b>
+            {feedback.correct && (
+              <span className="row" style={{ gap: 6 }}>
+                {feedback.streak >= 3 && <span className="chip amber"><Flame size={13} /> Chuỗi {feedback.streak}</span>}
+                <span className="chip green">+{feedback.points}</span>
+              </span>
+            )}
           </div>
-        </div>
-      </div>
+          <p className="small" style={{ marginTop: 6, color: 'var(--ink-2)' }}>{feedback.explain}</p>
+          <p className="tiny muted" style={{ marginTop: 6 }}>Chạm để sang câu tiếp</p>
+        </section>
+      )}
+      <p className="tiny muted" style={{ textAlign: 'center', marginTop: 14 }}>{attempt.note}</p>
+    </main>
+  )
+}
 
-      {/* Question */}
-      <div style={{ flex: 1, padding: '0 16px 16px', display: 'flex', flexDirection: 'column' }}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={qIdx}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={{ duration: 0.3 }}
-            style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20 }}
-          >
-            {/* Question card */}
-            <div style={{
-              background: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: 20,
-              padding: '24px 20px',
-              textAlign: 'center',
-              minHeight: 140,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <p style={{ color: 'white', fontSize: '1.15rem', fontWeight: 600, lineHeight: 1.5 }}>
-                {q.text}
-              </p>
-            </div>
-
-            {/* Options 2×2 grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              {q.options.map((opt, i) => {
-                const c = COLORS[i % 4]
-                const isSelected = selected === opt.id
-                const isCorrectOpt = correct === opt.id
-                let bg = `linear-gradient(135deg, ${c.bg}, ${c.light})`
-                let border = 'none'
-                if (phase === 'reveal') {
-                  if (isCorrectOpt) { bg = 'linear-gradient(135deg, #137333, #22C55E)'; border = '2px solid #4ADE80' }
-                  else if (isSelected) { bg = 'linear-gradient(135deg, #7F1D1D, #DC2626)'; border = '2px solid #F87171' }
-                  else bg = 'rgba(255,255,255,0.04)'
-                }
-
-                return (
-                  <motion.button
-                    key={opt.id}
-                    whileTap={phase === 'question' ? { scale: 0.95 } : {}}
-                    onClick={() => handleSelect(opt.id)}
-                    disabled={phase !== 'question'}
-                    style={{
-                      background: bg,
-                      border, borderRadius: 16,
-                      padding: '16px 12px',
-                      color: c.dark ? '#1A0A00' : 'white',
-                      fontFamily: 'inherit',
-                      fontSize: '0.9rem', fontWeight: 600,
-                      cursor: phase === 'question' ? 'pointer' : 'default',
-                      textAlign: 'left',
-                      minHeight: 80,
-                      display: 'flex', alignItems: 'center', gap: 10,
-                      transition: 'all 0.3s ease',
-                      boxShadow: phase === 'question' ? `0 4px 20px ${c.bg}60` : 'none',
-                    }}
-                  >
-                    <span style={{ fontSize: '1.3rem', flexShrink: 0 }}>{c.icon}</span>
-                    <span style={{ lineHeight: 1.3 }}>{opt.text}</span>
-                  </motion.button>
-                )
-              })}
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
+function CountRing({ left, total }: { left: number; total: number }) {
+  const r = 17
+  const c = 2 * Math.PI * r
+  return (
+    <div style={{ position: 'absolute', right: 12, top: 12, width: 42, height: 42 }} aria-label={`Còn ${Math.ceil(left)} giây`}>
+      <svg width="42" height="42" style={{ transform: 'rotate(-90deg)' }}>
+        <circle cx="21" cy="21" r={r} fill="rgba(0,0,0,.18)" stroke="rgba(255,255,255,.3)" strokeWidth="4" />
+        <circle cx="21" cy="21" r={r} fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - left / total)} />
+      </svg>
+      <b style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', fontSize: 14 }}>{Math.ceil(left)}</b>
     </div>
+  )
+}
+
+function ResultView({ attempt, result, me }: { attempt: Attempt; result: Result; me: Me | null }) {
+  const router = useRouter()
+  const [again, setAgain] = useState(false)
+  const needVoice = me && !me.onboarding.voice_done
+  const tone = result.percent >= 80 ? 'var(--green)' : result.percent >= 50 ? 'var(--l2)' : 'var(--red)'
+
+  async function replay() {
+    setAgain(true)
+    const { attempt_id } = await api<{ attempt_id: string }>('/quiz/start', { method: 'POST' })
+    router.push(`/hoc/quiz/${attempt_id}`)
+  }
+
+  return (
+    <main className="page bare">
+      <section className="card pop" style={{ textAlign: 'center', padding: 24 }}>
+        <div className="eyebrow">Kết quả thử thách 180 giây</div>
+        <div style={{ fontSize: 56, fontWeight: 800, color: tone, marginTop: 8, lineHeight: 1 }}>{result.percent}%</div>
+        <div className="muted" style={{ marginTop: 6 }}>{result.correct}/{result.total} câu đúng</div>
+        <div className="row" style={{ justifyContent: 'center', marginTop: 14 }}>
+          <span className="chip dark">{result.points.toLocaleString('vi-VN')} điểm game</span>
+          <span className="chip green">+{result.leaderboard_points} điểm tích lũy</span>
+        </div>
+      </section>
+
+      <section className="card">
+        <b>Theo nhóm kiến thức</b>
+        {Object.entries(result.by_category).map(([cat, r]) => (
+          <div key={cat} style={{ marginTop: 12 }}>
+            <div className="row between small"><span>{attempt.categories[cat]?.label ?? cat}</span><b>{r.correct}/{r.total}</b></div>
+            <div className="bar" style={{ marginTop: 6 }}>
+              <i style={{ width: `${r.total ? (r.correct / r.total) * 100 : 0}%`, background: r.correct === r.total ? 'var(--green)' : r.correct ? 'var(--l2)' : 'var(--red)' }} />
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <div className="stack" style={{ marginTop: 16 }}>
+        {needVoice && (
+          <Link href={`/hoc/voice/${me!.onboarding.voice_scenario}?kind=onboarding`} className="btn primary block">
+            <Mic size={18} /> Tiếp tục: đánh giá giọng nói 7 phút
+          </Link>
+        )}
+        <button className={`btn block ${needVoice ? 'ghost' : 'primary'}`} onClick={replay} disabled={again}><RotateCcw size={18} /> Chơi lượt mới</button>
+        <Link href="/hoc/passport" className="btn ghost block">Xem Passport năng lực</Link>
+      </div>
+    </main>
   )
 }

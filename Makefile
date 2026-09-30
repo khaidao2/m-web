@@ -1,44 +1,35 @@
-.PHONY: dev build deploy test clean
+.PHONY: dev api-dev web-dev test lint secrets argocd status logs
 
+KUBECONFIG ?= $(HOME)/.kube/k3s-fedora.yaml
+export KUBECONFIG
+PY ?= python3
+
+## Local: Postgres + Keycloak + API in Docker, Next.js dev server on :3000 (same-origin proxy)
 dev:
-	docker-compose up -d
+	@test -f .env || { echo "create .env first (see README)"; exit 1; }
+	docker compose up -d --build
+	cd frontend && BACKEND_URL=http://localhost:8000 KEYCLOAK_URL=http://localhost:8180 npm run dev
 
-dev-down:
-	docker-compose down
-
-build:
-	docker build -t pgnexus/backend:latest ./backend
-	docker build -t pgnexus/frontend:latest ./frontend
-
-load:
-	kind load docker-image pgnexus/backend:latest --name tien-web
-	kind load docker-image pgnexus/frontend:latest --name tien-web
-
-deploy: build load
-	kubectl --context=kind-tien-web apply -k k8s/base/
-	kubectl --context=kind-tien-web -n pgnexus rollout status deployment/backend
-	kubectl --context=kind-tien-web -n pgnexus rollout status deployment/frontend
-
-migrate:
-	kubectl --context=kind-tien-web exec -it -n pgnexus deployment/backend -- alembic upgrade head
-
-seed:
-	kubectl --context=kind-tien-web exec -it -n pgnexus deployment/backend -- python scripts/seed.py
-
+## Tests need a *_test database (never the app database)
 test:
-	docker-compose exec backend pytest tests/ -v --cov=app --cov-report=term-missing
+	docker compose exec -T postgres psql -U pgnexus -tc "SELECT 1 FROM pg_database WHERE datname='pgnexus_test'" | grep -q 1 || \
+	  docker compose exec -T postgres psql -U pgnexus -c "CREATE DATABASE pgnexus_test"
+	cd backend && TEST_DATABASE_URL=postgresql+asyncpg://pgnexus:$$(grep ^POSTGRES_PASSWORD ../.env | cut -d= -f2)@localhost:55432/pgnexus_test $(PY) -m pytest -q
 
-keycloak-setup:
-	bash scripts/setup-keycloak.sh
+lint:
+	cd backend && ruff check app tests scripts
+	cd frontend && npm run lint && npm run typecheck
 
-clean:
-	docker-compose down -v
+## Cluster (k3s: fedora control plane + fedora-1 worker)
+secrets:
+	./scripts/bootstrap-secrets.sh
+
+argocd:
+	kubectl apply -f deploy/argocd/masan-lms.yaml
 
 status:
-	kubectl --context=kind-tien-web get all -n pgnexus
+	kubectl -n pgnexus get pods,ingress
+	kubectl -n argocd get application masan-lms
 
-logs-backend:
-	kubectl --context=kind-tien-web logs -n pgnexus -l app=backend -f
-
-logs-frontend:
-	kubectl --context=kind-tien-web logs -n pgnexus -l app=frontend -f
+logs:
+	kubectl -n pgnexus logs deploy/backend -f

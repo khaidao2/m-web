@@ -1,0 +1,10 @@
+{
+  "name": "PG NEXUS • Masan Consumer",
+  "short_name": "PG NEXUS",
+  "start_url": "/hoc",
+  "display": "standalone",
+  "background_color": "#f2f3f7",
+  "theme_color": "#f2f3f7",
+  "lang": "vi",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

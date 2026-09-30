@@ -1,92 +1,54 @@
+# Local stack: Postgres + Keycloak + API. Run the frontend with `npm run dev` (see Makefile `dev`),
+# which proxies /api and /auth so the browser sees one origin, like the cluster ingress.
 services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: pgnexus
       POSTGRES_USER: pgnexus
-      POSTGRES_PASSWORD: pgnexus_dev_pass
-    ports:
-      - "5433:5432"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+      POSTGRES_DB: pgnexus
+    ports: ["55432:5432"]
     volumes:
       - pg_data:/var/lib/postgresql/data
+      - ./k8s/base/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U pgnexus"]
-      interval: 10s
-      retries: 5
-      start_period: 10s
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6380:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      retries: 3
+      interval: 5s
+      retries: 20
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.0
+    image: quay.io/keycloak/keycloak:26.7.4
+    command: ["start-dev", "--import-realm"]
     environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD:?set in .env}
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/pgnexus
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
       KC_DB_USERNAME: pgnexus
-      KC_DB_PASSWORD: pgnexus_dev_pass
-      KC_HOSTNAME: localhost
-      KC_HOSTNAME_PORT: "8180"
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HTTP_PORT: "8080"
-      KC_HOSTNAME_STRICT: "false"
-      KC_HTTP_ENABLED: "true"
-    command: start-dev
-    ports:
-      - "8180:8080"
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_HOSTNAME: http://localhost:3000/auth
+      KC_HEALTH_ENABLED: "true"
+      APP_URL: http://localhost:3000
+      DEMO_PG_PASSWORD: ${DEMO_PG_PASSWORD:?set in .env}
+      DEMO_SUP_PASSWORD: ${DEMO_SUP_PASSWORD:?set in .env}
+    ports: ["8180:8080"]
+    volumes:
+      - ./k8s/base/keycloak/pgnexus-realm.json:/opt/keycloak/data/import/pgnexus-realm.json:ro
     depends_on:
-      postgres:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health/ready || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 60s
+      postgres: { condition: service_healthy }
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    build: ./backend
+    command: ["sh", "-c", "alembic upgrade head && python -m scripts.seed && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
     environment:
-      DATABASE_URL: postgresql+asyncpg://pgnexus:pgnexus_dev_pass@postgres:5432/pgnexus
-      REDIS_URL: redis://redis:6379/0
-      KEYCLOAK_URL: http://keycloak:8080
-      KEYCLOAK_REALM: pgnexus
+      DATABASE_URL: postgresql+asyncpg://pgnexus:${POSTGRES_PASSWORD}@postgres:5432/pgnexus
+      KEYCLOAK_ISSUER: http://localhost:3000/auth/realms/pgnexus
+      KEYCLOAK_JWKS_URL: http://keycloak:8080/auth/realms/pgnexus/protocol/openid-connect/certs
       DEBUG: "true"
-      SECRET_KEY: local-dev-secret-key
-    ports:
-      - "8000:8000"
+    ports: ["8000:8000"]
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
-      NEXT_PUBLIC_KEYCLOAK_URL: http://localhost:8180
-      NEXT_PUBLIC_KEYCLOAK_REALM: pgnexus
-      NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: pgnexus-frontend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
+      postgres: { condition: service_healthy }
 
 volumes:
   pg_data:
-  redis_data:

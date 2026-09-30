@@ -1,37 +1,27 @@
+# One origin for everything. Only Keycloak's token/logout/certs endpoints are public:
+# the app renders its own login, and Keycloak's pages and admin console stay internal.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: pgnexus-ingress
-  namespace: pgnexus
-  annotations:
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+  name: pgnexus
 spec:
+  ingressClassName: traefik
   rules:
-  - host: pgnexus.local
-    http:
-      paths:
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: backend
-            port:
-              number: 8000
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: frontend
-            port:
-              number: 3000
-  - host: auth.pgnexus.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: keycloak
-            port:
-              number: 8080
+    - host: app.example.invalid   # set per environment by the overlay
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend: { service: { name: backend, port: { number: 8000 } } }
+          - path: /auth/realms/pgnexus/protocol/openid-connect/token
+            pathType: Exact
+            backend: { service: { name: keycloak, port: { number: 8080 } } }
+          - path: /auth/realms/pgnexus/protocol/openid-connect/logout
+            pathType: Exact
+            backend: { service: { name: keycloak, port: { number: 8080 } } }
+          - path: /auth/realms/pgnexus/protocol/openid-connect/certs
+            pathType: Exact
+            backend: { service: { name: keycloak, port: { number: 8080 } } }
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: frontend, port: { number: 3000 } } }

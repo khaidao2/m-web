@@ -1,247 +1,124 @@
 'use client'
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { getToken } from '@/lib/auth'
-import { api } from '@/lib/api'
-import PassportRadar from '@/components/PassportRadar'
+import { ChevronRight, ClipboardCheck, Mic, Play, Trophy, Zap, CheckCircle2 } from 'lucide-react'
+import { BRANDS } from '@/lib/products'
+import { BrandVisual } from '@/components/Brand'
+import QuestItem from '@/components/QuestItem'
+import { ErrorBox, Loading, Stat } from '@/components/ui'
+import { firstName, greeting, initials, num } from '@/lib/format'
+import { useApi } from '@/lib/useApi'
+import type { Leaderboard, Me, Quest } from '@/lib/types'
 
-interface UserData {
-  full_name: string
-  store_code: string
-  points: number
-  streak_days: number
-}
-interface RankData { rank: number; total: number }
-interface PassportData {
-  scores: Record<string, number>
-  total_points: number
-  red_flags: string[]
-}
-interface Quest { id: string; title: string; type: string; completed: boolean }
+export default function Home() {
+  const me = useApi<Me>('/me')
+  const quests = useApi<Quest[]>('/quests/today')
+  const board = useApi<Leaderboard>('/leaderboard?period=week')
 
-const QUICK_ACTIONS = [
-  { icon: '🎯', label: 'Làm Bài Kiểm Tra', href: '/hoc/quests',      color: '#C8102E' },
-  { icon: '🎙️', label: 'Luyện Giọng AI',   href: '/hoc/voice',       color: '#7C3AED' },
-  { icon: '🏆', label: 'Bảng Xếp Hạng',   href: '/hoc/leaderboard', color: '#FFB800' },
-  { icon: '📋', label: 'Nhiệm Vụ Hôm Nay', href: '/hoc/quests',      color: '#0EA5E9' },
-]
-
-function Skeleton({ w = '100%', h = 20, r = 8 }: { w?: string | number; h?: number; r?: number }) {
-  return <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
-}
-
-export default function HomePage() {
-  const [user, setUser]       = useState<UserData | null>(null)
-  const [rank, setRank]       = useState<RankData | null>(null)
-  const [passport, setPassport] = useState<PassportData | null>(null)
-  const [quests, setQuests]   = useState<Quest[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const token = getToken()!
-    Promise.all([
-      api.me(token).catch(() => null),
-      api.myRank(token).catch(() => null),
-      api.passport(token).catch(() => null),
-      api.quests(token).catch(() => []),
-    ]).then(([u, r, p, q]) => {
-      setUser(u)
-      setRank(r)
-      setPassport(p)
-      setQuests(Array.isArray(q) ? q : [])
-      setLoading(false)
-    })
-  }, [])
-
-  const pendingQuests = quests.filter(q => !q.completed).length
+  if (me.loading && !me.data) return <Loading />
+  if (me.error || !me.data) return <div className="page"><ErrorBox error={me.error ?? ''} retry={me.reload} /></div>
+  const u = me.data
+  const ob = u.onboarding
+  const steps = [
+    { done: ob.quiz_done, icon: Zap, tone: '', title: 'Quiz phản xạ · 3 phút', sub: '10 câu · 5 nhóm · Kiến thức tại điểm bán', href: '/hoc/quiz' },
+    { done: ob.voice_done, icon: Mic, tone: 'blue', title: 'Đánh giá giọng nói đầu vào', sub: '7 phút · AI đóng vai khách hàng', href: `/hoc/voice/${ob.voice_scenario}?kind=onboarding` },
+    { done: ob.complete, icon: ClipboardCheck, tone: '', title: 'Xác nhận tại điểm bán', sub: 'SUP bổ sung số liệu & quan sát', href: '/hoc/passport' },
+  ]
+  const doneSteps = steps.filter((s) => s.done).length
+  const next = !ob.quiz_done ? steps[0] : !ob.voice_done ? steps[1] : null
+  const pending = quests.data?.filter((q) => !q.done) ?? []
 
   return (
-    <div className="page" style={{ background: 'var(--bg)' }}>
-      {/* Top Bar */}
-      <div className="top-bar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{
-            background: 'linear-gradient(135deg, var(--red), #FF2D55)',
-            borderRadius: 10, padding: '6px 12px',
-            boxShadow: 'var(--shadow-red)',
-          }}>
-            <span style={{ color: 'white', fontWeight: 800, fontSize: '0.9rem', letterSpacing: -0.5 }}>
-              PG<span style={{ color: '#FFB800' }}>-NEXUS</span>
-            </span>
-          </div>
+    <main className="page">
+      <section className="row between rise" style={{ margin: '6px 2px 16px' }}>
+        <div className="grow">
+          <div className="eyebrow">Hành trình thực chiến</div>
+          <h1 className="h1" style={{ marginTop: 6 }}>{greeting()}, {firstName(u.full_name)}!</h1>
+          <p className="muted small truncate" style={{ marginTop: 4 }}>{u.store_name ?? 'Cập nhật cửa hàng trong hồ sơ'} · BHX HCM</p>
         </div>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <button style={{ background: 'none', border: 'none', fontSize: '1.3rem', cursor: 'pointer', padding: 4 }}>🔔</button>
-          <div style={{
-            width: 36, height: 36,
-            background: 'linear-gradient(135deg, var(--red), var(--red-light))',
-            borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 700, color: 'white', fontSize: '0.875rem',
-            boxShadow: '0 2px 12px rgba(200,16,46,0.4)',
-          }}>
-            {user?.full_name?.[0] ?? '?'}
-          </div>
-        </div>
+        <div className="tile" style={{ width: 48, height: 48, fontWeight: 800 }}>{initials(u.full_name)}</div>
+      </section>
+
+      <section className="rise" style={{
+        position: 'relative', overflow: 'hidden', borderRadius: 22, padding: 22, color: '#fff',
+        background: 'linear-gradient(135deg, #d71920 0%, #b3121b 100%)', boxShadow: 'var(--shadow-red)',
+      }}>
+        <span aria-hidden style={{ position: 'absolute', right: -6, bottom: -26, fontSize: 120, fontWeight: 800, opacity: 0.1, lineHeight: 1 }}>
+          {next ? '03' : String(pending.length).padStart(2, '0')}
+        </span>
+        <span className="chip" style={{ background: 'rgba(255,255,255,.18)', color: '#fff' }}><Zap size={13} /> Mỗi ngày một bước tiến</span>
+        {next ? (
+          <>
+            <h2 style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.25, marginTop: 14 }}>{next === steps[0] ? <>3 phút hôm nay.<br />Tự tin cả ca làm.</> : <>7 phút với AI.<br />Biết mình mạnh ở đâu.</>}</h2>
+            <p style={{ opacity: 0.88, fontSize: 13.5, marginTop: 8 }}>{next === steps[0] ? 'Khởi động kiến thức, sẵn sàng đón khách.' : 'Hoàn thành bài đầu vào để mở Digital Passport.'}</p>
+            <Link href={next.href} className="btn" style={{ background: '#fff', color: 'var(--red-deep)', marginTop: 16, height: 46 }}>
+              <Play size={17} /> {next === steps[0] ? 'Bắt đầu quiz hôm nay' : 'Bắt đầu đánh giá giọng nói'}
+            </Link>
+          </>
+        ) : (
+          <>
+            <h2 style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.25, marginTop: 14 }}>
+              {pending.length ? <>{pending.length} nhiệm vụ 3 phút<br />đang chờ bạn.</> : <>Xong nhiệm vụ hôm nay.<br />Giữ vững phong độ!</>}
+            </h2>
+            <p style={{ opacity: 0.88, fontSize: 13.5, marginTop: 8 }}>Bài luyện nhắm thẳng vào điểm nghẽn trên Passport của bạn.</p>
+            <Link href={pending[0] ? `/hoc/voice/${pending[0].scenario.code}?quest=${pending[0].id}` : '/hoc/quiz'} className="btn"
+              style={{ background: '#fff', color: 'var(--red-deep)', marginTop: 16, height: 46 }}>
+              <Play size={17} /> {pending.length ? 'Luyện ngay' : 'Chơi thử thách 180 giây'}
+            </Link>
+          </>
+        )}
+      </section>
+
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginTop: 14 }}>
+        <Stat value={num(u.stats.points)} label="Điểm tích lũy" accent />
+        <Stat value={u.stats.days_learned} label="Ngày đã học" />
+        <Stat value={u.stats.open_flags} label="Điểm cần cải thiện" />
+      </section>
+
+      {!ob.complete ? (
+        <>
+          <div className="section-title">Lộ trình của bạn <span className="chip">{doneSteps}/3 đầu vào</span></div>
+          {steps.map((s) => (
+            <Link key={s.title} href={s.href} className="item">
+              <div className={`tile ${s.done ? 'green' : s.tone}`}>{s.done ? <CheckCircle2 size={21} /> : <s.icon size={21} />}</div>
+              <div className="grow">
+                <div style={{ fontWeight: 600 }}>{s.title}</div>
+                <div className="tiny muted">{s.sub}</div>
+              </div>
+              <ChevronRight size={18} color="var(--muted)" />
+            </Link>
+          ))}
+        </>
+      ) : (
+        <>
+          <div className="section-title">Nhiệm vụ hôm nay <Link href="/hoc/quests">Tất cả <ChevronRight size={14} /></Link></div>
+          {quests.error && <ErrorBox error={quests.error} retry={quests.reload} />}
+          {quests.data?.slice(0, 3).map((q) => <QuestItem key={q.id} quest={q} />)}
+        </>
+      )}
+
+      <div className="section-title">Hiểu sản phẩm, bán tự tin <Link href="/hoc/quiz">Khám phá <ChevronRight size={14} /></Link></div>
+      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', margin: '0 -16px', padding: '2px 16px 8px', scrollSnapType: 'x mandatory' }}>
+        {BRANDS.map((b) => (
+          <Link key={b.slug} href={`/hoc/quiz?brand=${b.slug}`} className="card" style={{ minWidth: 132, textAlign: 'center', scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+            <BrandVisual brand={b} size={76} />
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 14 }}>{b.name}</div>
+              <div className="tiny muted">{b.category}</div>
+            </div>
+          </Link>
+        ))}
       </div>
 
-      <div style={{ padding: '0 16px' }}>
-        {/* Welcome card */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          style={{
-            marginTop: 16,
-            padding: '20px 20px',
-            borderRadius: 20,
-            background: 'linear-gradient(135deg, #8B0000 0%, #C8102E 50%, #FF2D55 100%)',
-            boxShadow: '0 8px 32px rgba(200,16,46,0.4)',
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-        >
-          {/* Decorative blur */}
-          <div style={{
-            position: 'absolute', top: -30, right: -30,
-            width: 120, height: 120,
-            background: 'rgba(255,184,0,0.2)',
-            borderRadius: '50%', filter: 'blur(30px)',
-          }} />
-          {loading ? (
-            <>
-              <Skeleton h={22} w="60%" />
-              <Skeleton h={16} w="80%" r={6} />
-            </>
-          ) : (
-            <>
-              <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.8rem', marginBottom: 4 }}>
-                Xin chào 👋
-              </div>
-              <div style={{ color: 'white', fontSize: '1.2rem', fontWeight: 700 }}>
-                {user?.full_name ?? 'PG'}!
-              </div>
-              <div style={{
-                color: 'rgba(255,255,255,0.85)', fontSize: '0.875rem', marginTop: 6,
-                background: 'rgba(0,0,0,0.2)', display: 'inline-block',
-                padding: '4px 10px', borderRadius: 99,
-              }}>
-                🎯 Hôm nay bạn có{' '}
-                <strong style={{ color: '#FFB800' }}>{pendingQuests} nhiệm vụ</strong> chờ hoàn thành
-              </div>
-            </>
-          )}
-        </motion.div>
-
-        {/* Stat cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginTop: 16 }}>
-          {[
-            {
-              icon: '⭐', label: 'Điểm', value: loading ? '...' : (user?.points ?? 0).toLocaleString(),
-              bg: 'linear-gradient(135deg, rgba(255,184,0,0.15), rgba(255,184,0,0.05))',
-              border: 'rgba(255,184,0,0.3)', color: '#FFB800',
-            },
-            {
-              icon: '🏆', label: 'Hạng', value: loading ? '...' : `#${rank?.rank ?? '-'}`,
-              bg: 'linear-gradient(135deg, rgba(200,16,46,0.15), rgba(200,16,46,0.05))',
-              border: 'rgba(200,16,46,0.3)', color: '#FF4060',
-            },
-            {
-              icon: '🔥', label: 'Streak', value: loading ? '...' : `${user?.streak_days ?? 0}d`,
-              bg: 'linear-gradient(135deg, rgba(249,115,22,0.15), rgba(249,115,22,0.05))',
-              border: 'rgba(249,115,22,0.3)', color: '#FB923C',
-            },
-          ].map(s => (
-            <motion.div
-              key={s.label}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-              style={{
-                background: s.bg, border: `1px solid ${s.border}`,
-                borderRadius: 14, padding: '14px 10px', textAlign: 'center',
-              }}
-            >
-              <div style={{ fontSize: '1.4rem' }}>{s.icon}</div>
-              <div style={{ color: s.color, fontSize: '1.1rem', fontWeight: 700, marginTop: 4 }}>
-                {s.value}
-              </div>
-              <div style={{ color: 'var(--text3)', fontSize: '0.7rem', marginTop: 2 }}>{s.label}</div>
-            </motion.div>
-          ))}
+      <Link href="/hoc/leaderboard" className="item" style={{ marginTop: 14 }}>
+        <div className="tile amber"><Trophy size={21} /></div>
+        <div className="grow">
+          <div style={{ fontWeight: 600 }}>Bảng vàng PG NEXUS</div>
+          <div className="tiny muted">
+            {board.data?.me ? `Hạng #${board.data.me.rank}/${board.data.me.total_pgs} tuần này · ${num(board.data.me.points)} điểm` : 'Xem vị trí và tiến bộ của bạn'}
+          </div>
         </div>
-
-        {/* Quick Actions */}
-        <div className="section-header" style={{ marginTop: 8 }}>
-          <span className="section-title">Hành Động Nhanh</span>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          {QUICK_ACTIONS.map((a, i) => (
-            <motion.div
-              key={a.label}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.05 * i }}
-            >
-              <Link href={a.href} style={{ textDecoration: 'none' }}>
-                <div style={{
-                  background: `${a.color}18`,
-                  border: `1px solid ${a.color}40`,
-                  borderRadius: 16,
-                  padding: '18px 16px',
-                  display: 'flex', flexDirection: 'column', gap: 8,
-                  cursor: 'pointer', transition: 'transform 0.15s ease',
-                  minHeight: 90,
-                }} className="card">
-                  <span style={{ fontSize: '1.6rem' }}>{a.icon}</span>
-                  <span style={{ color: 'var(--text)', fontWeight: 600, fontSize: '0.85rem', lineHeight: 1.3 }}>
-                    {a.label}
-                  </span>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Passport preview */}
-        <div className="section-header" style={{ marginTop: 4 }}>
-          <span className="section-title">📊 Hộ Chiếu Năng Lực</span>
-          <Link href="/hoc/passport" style={{
-            color: 'var(--red)', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none',
-          }}>Xem chi tiết →</Link>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="card"
-          style={{ padding: '16px 12px' }}
-        >
-          {loading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200 }}>
-              <div className="skeleton" style={{ width: 200, height: 200, borderRadius: '50%' }} />
-            </div>
-          ) : passport ? (
-            <>
-              <PassportRadar scores={passport.scores ?? {}} />
-              {passport.red_flags?.length > 0 && (
-                <div style={{ marginTop: 12, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {passport.red_flags.map((f: string) => (
-                    <span key={f} className="red-flag">🚩 {f}</span>
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            <div style={{ textAlign: 'center', color: 'var(--text3)', padding: '40px 0' }}>
-              Chưa có dữ liệu năng lực
-            </div>
-          )}
-        </motion.div>
-
-        <div style={{ height: 24 }} />
-      </div>
-    </div>
+        <ChevronRight size={18} color="var(--muted)" />
+      </Link>
+    </main>
   )
 }
