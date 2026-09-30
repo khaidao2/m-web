@@ -75,9 +75,6 @@ svg { flex-shrink: 0; }
 
 .wordmark { font-weight: 800; letter-spacing: -0.02em; font-size: 18px; }
 .wordmark b { color: var(--red); font-weight: 800; }
-.masan { display: flex; flex-direction: column; align-items: flex-end; line-height: 1; }
-.masan span:first-child { font-weight: 800; color: var(--red); letter-spacing: 0.06em; font-size: 14px; }
-.masan span:last-child { font-size: 8px; letter-spacing: 0.32em; color: var(--ink-2); margin-top: 3px; }
 
 /* cards & text */
 .card {

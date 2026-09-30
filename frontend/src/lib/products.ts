@@ -1,5 +1,5 @@
-/* Brand cards for "Hiểu sản phẩm". USPs come from the project doc; images are optional
-   files in /public/brand/<slug>.jpg and fall back to a vector tile. */
+/* Brand cards for "Hiểu sản phẩm". USPs come from the project doc; photos are
+   /public/brand/<slug>.webp (a vector tile is shown if one is missing). */
 export type Brand = {
   slug: string
   name: string

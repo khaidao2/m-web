@@ -77,7 +77,7 @@ function Learn() {
                 <ul className="tiny" style={{ paddingLeft: 16, color: 'var(--ink-2)' }}>
                   {b.usp.map((u) => <li key={u}>{u}</li>)}
                 </ul>
-                {b.pair && <span className="chip blue" style={{ alignSelf: 'center' }}>Combo: {b.pair}</span>}
+                {b.pair && <span className="chip blue" style={{ alignSelf: 'center', height: 'auto', minHeight: 26, padding: '4px 10px', textAlign: 'center' }}>Combo: {b.pair}</span>}
               </article>
             ))}
           </div>

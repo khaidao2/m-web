@@ -8,22 +8,18 @@ export function Wordmark() {
 }
 
 export function MasanMark() {
-  return (
-    <span className="masan" aria-label="Masan Consumer">
-      <span>MASAN</span>
-      <span>CONSUMER</span>
-    </span>
-  )
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src="/brand/masan-logo.webp" alt="Masan Consumer" width={78} height={30} style={{ height: 30, width: 'auto', display: 'block' }} />
 }
 
-/** Product photo if /brand/<slug>.jpg is provided, otherwise a vector tile in brand colour. */
+/** Product photo from /brand/<slug>.webp, otherwise a vector tile in brand colour. */
 export function BrandVisual({ brand, size = 92 }: { brand: Brand; size?: number }) {
   const [failed, setFailed] = useState(false)
   if (!failed) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={`/brand/${brand.slug}.jpg`} alt={brand.name} width={size} height={size} onError={() => setFailed(true)}
-        style={{ width: size, height: size, objectFit: 'contain' }} />
+      <img src={`/brand/${brand.slug}.webp`} alt={brand.name} width={size} height={size} onError={() => setFailed(true)}
+        style={{ width: size, height: size, objectFit: 'contain', borderRadius: 14 }} />
     )
   }
   return (
