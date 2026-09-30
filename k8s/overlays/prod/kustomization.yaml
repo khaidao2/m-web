@@ -3,23 +3,25 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../../base
+- ../../base
 configMapGenerator:
-  - name: pgnexus-config
-    literals:
-      - APP_URL=https://masan-lms.sentpul.click
-      - KEYCLOAK_PUBLIC_URL=https://masan-lms.sentpul.click/auth
-      - KEYCLOAK_ISSUER=https://masan-lms.sentpul.click/auth/realms/pgnexus
+- literals:
+  - APP_URL=https://masan-lms.sentpul.click
+  - KEYCLOAK_PUBLIC_URL=https://masan-lms.sentpul.click/auth
+  - KEYCLOAK_ISSUER=https://masan-lms.sentpul.click/auth/realms/pgnexus
+  name: pgnexus-config
 patches:
-  - target: { kind: Ingress, name: pgnexus }
-    patch: |-
-      - op: replace
-        path: /spec/rules/0/host
-        value: masan-lms.sentpul.click
+- patch: |-
+    - op: replace
+      path: /spec/rules/0/host
+      value: masan-lms.sentpul.click
+  target:
+    kind: Ingress
+    name: pgnexus
 images:
-  - name: pgnexus-backend
-    newName: ghcr.io/khaidao2/m-web-backend
-    newTag: latest
-  - name: pgnexus-frontend
-    newName: ghcr.io/khaidao2/m-web-frontend
-    newTag: latest
+- name: pgnexus-backend
+  newName: ghcr.io/khaidao2/m-web-backend
+  newTag: 2225e4d67d9c5dc0ac449faae4a6b76efa066bd2
+- name: pgnexus-frontend
+  newName: ghcr.io/khaidao2/m-web-frontend
+  newTag: 2225e4d67d9c5dc0ac449faae4a6b76efa066bd2
