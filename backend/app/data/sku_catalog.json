@@ -1,0 +1,15 @@
+{
+ "note": "MCH brands sold in BHX (from the project doc's core SKUs). Matching is diacritics-insensitive; the first matching entry wins, so specific entries come first. Replace with the official SKU list when Sales Cap provides it.",
+ "brands": [
+  {"brand": "Wake-Up 247", "slug": "wake-up-247", "category": "Đồ uống", "keywords": ["wake up 247", "wakeup 247", "wake-up 247", "nuoc tang luc 247"]},
+  {"brand": "Vinacafé", "slug": "vinacafe", "category": "Cà phê", "keywords": ["vinacafe", "vina cafe", "wake up cafe", "wakeup cafe", "wake up ca phe"]},
+  {"brand": "Đệ Nhị", "slug": "nam-ngu", "category": "Gia vị", "keywords": ["de nhi"]},
+  {"brand": "Nam Ngư", "slug": "nam-ngu", "category": "Gia vị", "keywords": ["nam ngu"]},
+  {"brand": "CHIN-SU", "slug": "chin-su", "category": "Gia vị", "keywords": ["chinsu", "chin su", "chin-su"]},
+  {"brand": "Barona", "slug": null, "category": "Gia vị", "keywords": ["barona"]},
+  {"brand": "Tam Thái Tử", "slug": null, "category": "Gia vị", "keywords": ["tam thai tu"]},
+  {"brand": "Omachi", "slug": "omachi", "category": "Mì ăn liền", "keywords": ["omachi"]},
+  {"brand": "Kokomi", "slug": "kokomi", "category": "Mì ăn liền", "keywords": ["kokomi"]},
+  {"brand": "Vĩnh Hảo", "slug": "vinh-hao", "category": "Nước khoáng", "keywords": ["vinh hao"]}
+ ]
+}

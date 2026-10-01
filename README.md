@@ -7,6 +7,11 @@ Mobile-first e-learning web app for Masan Consumer PGs at Bách hoá Xanh (Chrom
 - **Thực chiến** – 50 roleplay scenarios (KH/CHT/NV/KM/BH) with a voice persona, scoring C1–C6 on 0–10 with evidence
 - **Passport** – 7-competency radar, levels, Red Flags (< 5.0 opens, ≥ 7.0 + SUP stamp closes; unassessed ≠ 0)
 - **Thành tích** – week/month/quarter leaderboard, top-3 podium, change vs previous period, what to improve/keep
+- **Scan bill D-day** – PG joins a SUP-configured program (shift + self-declared hours), photographs the bill; server OCR
+  (Tesseract, Vietnamese) drafts bill no./time/store/lines, MCH SKUs are matched from `backend/app/data/sku_catalog.json`,
+  the PG corrects and confirms (every edit logged), checks mark Hợp lệ / Cần xem xét / Loại (duplicate photo or bill no.,
+  wrong day/store, totals mismatch, no MCH); bills are never deleted, only voided with a reason. Results: MCH value,
+  value/hour, multi-category rate, value/bill, per-SKU volume, CSV export. SUP reviews flagged bills.
 - **SUP** – pilot KPIs, Red Flag queue, listen back to recordings, AI-vs-SUP scoring, Stamp, field audit (revenue, D-day, C7)
 
 ## AI (mock)

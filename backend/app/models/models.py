@@ -7,7 +7,8 @@ import uuid
 from datetime import date, datetime
 
 from sqlalchemy import (
-    JSON, BigInteger, Date, DateTime, Enum, Float, ForeignKey, Index, Integer, LargeBinary, String, Text, func,
+    JSON, BigInteger, Date, DateTime, Enum, Float, ForeignKey, Index, Integer, LargeBinary, String, Text,
+    UniqueConstraint, func,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -172,4 +173,78 @@ class FieldAudit(Base):
     extra_displays: Mapped[int | None] = mapped_column(Integer)
     c7_score: Mapped[float | None] = mapped_column(Float)
     note: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class BillStatus(str, enum.Enum):
+    DRAFT = "draft"        # read by OCR, waiting for the PG to check and confirm
+    VALID = "valid"        # counts toward D-day results
+    REVIEW = "review"      # failed an automatic check; SUP decides
+    REJECTED = "rejected"  # duplicate or not eligible
+    VOID = "void"          # withdrawn with a reason; never deleted (append-only ledger)
+
+
+class DdayProgram(Base):
+    """A D-day / hoạt náo program configured by the SUP; PGs join it with a shift."""
+    __tablename__ = "dday_programs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    name: Mapped[str] = mapped_column(String(200))
+    activity: Mapped[str] = mapped_column(String(40))
+    day: Mapped[date] = mapped_column(Date, index=True)
+    store_name: Mapped[str] = mapped_column(String(200))
+    is_open: Mapped[bool] = mapped_column(default=True)
+    created_by: Mapped[str] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class DdayShift(Base):
+    __tablename__ = "dday_shifts"
+    __table_args__ = (UniqueConstraint("user_id", "program_id", name="uq_shift_user_program"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    program_id: Mapped[str] = mapped_column(ForeignKey("dday_programs.id", ondelete="CASCADE"))
+    hours: Mapped[float] = mapped_column(Float)   # self-declared, not yet verified
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Bill(Base):
+    __tablename__ = "bills"
+    __table_args__ = (Index("ix_bills_program_status", "program_id", "status"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    shift_id: Mapped[str] = mapped_column(ForeignKey("dday_shifts.id", ondelete="CASCADE"))
+    program_id: Mapped[str] = mapped_column(ForeignKey("dday_programs.id", ondelete="CASCADE"))
+    image_sha256: Mapped[str] = mapped_column(String(64), index=True)
+    status: Mapped[BillStatus] = mapped_column(_enum(BillStatus), default=BillStatus.DRAFT)
+    flags: Mapped[list] = mapped_column(JSON, default=list)
+    bill_no: Mapped[str | None] = mapped_column(String(60))
+    store_name: Mapped[str | None] = mapped_column(String(200))
+    purchased_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    total_vnd: Mapped[int | None] = mapped_column(BigInteger)
+    lines: Mapped[list] = mapped_column(JSON, default=list)
+    ocr_text: Mapped[str] = mapped_column(Text, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class BillImage(Base):
+    __tablename__ = "bill_images"
+
+    bill_id: Mapped[str] = mapped_column(ForeignKey("bills.id", ondelete="CASCADE"), primary_key=True)
+    mime: Mapped[str] = mapped_column(String(40))
+    data: Mapped[bytes] = mapped_column(LargeBinary)
+
+
+class BillEvent(Base):
+    """Audit trail: every OCR read, PG edit, confirmation, SUP decision and void."""
+    __tablename__ = "bill_events"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_id)
+    bill_id: Mapped[str] = mapped_column(ForeignKey("bills.id", ondelete="CASCADE"), index=True)
+    actor_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
+    action: Mapped[str] = mapped_column(String(30))
+    detail: Mapped[dict] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

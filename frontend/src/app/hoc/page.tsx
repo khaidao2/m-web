@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { ChevronRight, ClipboardCheck, Mic, Play, Trophy, Zap, CheckCircle2 } from 'lucide-react'
+import { ChevronRight, ClipboardCheck, Mic, Play, ScanLine, Trophy, Zap, CheckCircle2 } from 'lucide-react'
 import { BRANDS } from '@/lib/products'
 import { BrandVisual } from '@/components/Brand'
 import QuestItem from '@/components/QuestItem'
@@ -37,6 +37,15 @@ export default function Home() {
         </div>
         <div className="tile" style={{ width: 48, height: 48, fontWeight: 800 }}>{initials(u.full_name)}</div>
       </section>
+
+      <Link href="/hoc/bill" className="item rise" style={{ background: 'var(--ink)', color: '#fff', marginBottom: 14 }}>
+        <div className="tile" style={{ background: 'var(--red)', color: '#fff' }}><ScanLine size={21} /></div>
+        <div className="grow">
+          <div style={{ fontWeight: 700 }}>Scan bill D-day</div>
+          <div className="tiny" style={{ opacity: 0.75 }}>Chụp bill · Kiểm tra SKU · Xem kết quả</div>
+        </div>
+        <ChevronRight size={18} />
+      </Link>
 
       <section className="rise" style={{
         position: 'relative', overflow: 'hidden', borderRadius: 22, padding: 22, color: '#fff',

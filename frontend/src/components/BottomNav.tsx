@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { MasanMark, Wordmark } from './Brand'
-import { BookOpen, ClipboardCheck, Gauge, House, IdCard, Mic, Trophy, type LucideIcon } from 'lucide-react'
+import { BookOpen, ClipboardCheck, Gauge, House, IdCard, Mic, ScanLine, Trophy, type LucideIcon } from 'lucide-react'
 
 type NavItem = { href: string; label: string; icon: LucideIcon; center?: boolean }
 
@@ -17,6 +17,7 @@ const PG_NAV: NavItem[] = [
 const SUP_NAV: NavItem[] = [
   { href: '/sup', label: 'Tổng quan', icon: Gauge },
   { href: '/sup/flags', label: 'Red Flag', icon: ClipboardCheck },
+  { href: '/sup/bills', label: 'Bill D-day', icon: ScanLine },
 ]
 
 export default function BottomNav({ role }: { role: 'pg' | 'supervisor' }) {

@@ -268,3 +268,27 @@ body:has(.live-session) .bottom-nav { display: none; }
 @media (min-width: 1280px) {
   .page:not(.focused) .grid2 { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* bill scanner */
+.scan-target {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  min-height: 210px; border-radius: 20px; border: 2px dashed #f2b8bb; background: var(--red-soft);
+  color: var(--red-deep); text-align: center; padding: 20px; cursor: pointer;
+}
+.scan-target:active { transform: scale(0.99); }
+.scan-photo { position: relative; border-radius: 16px; overflow: hidden; background: #111; }
+.scan-photo img { display: block; width: 100%; max-height: 360px; object-fit: contain; }
+.scan-photo .laser {
+  position: absolute; left: 0; right: 0; height: 3px; background: var(--red);
+  box-shadow: 0 0 18px 4px rgba(215, 25, 32, .6); animation: laser 1.6s ease-in-out infinite alternate;
+}
+@keyframes laser { from { top: 4%; } to { top: 94%; } }
+.steps { display: flex; gap: 6px; margin: 4px 0 14px; }
+.steps span { flex: 1; height: 4px; border-radius: 99px; background: var(--line); }
+.steps span.on { background: var(--red); }
+.line-card { display: grid; grid-template-columns: 40px 1fr; gap: 10px; padding: 12px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow); }
+.line-card + .line-card { margin-top: 8px; }
+.line-card .nums { display: grid; grid-template-columns: 70px 1fr auto; gap: 8px; margin-top: 8px; align-items: center; }
+.line-card .input { height: 40px; font-size: 14px; }
+.bill-card { position: relative; overflow: hidden; }
+.bill-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--stripe, var(--line)); }

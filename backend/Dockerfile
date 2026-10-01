@@ -4,6 +4,10 @@ FROM python:3.13-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
 WORKDIR /app
 
+# Tesseract with Vietnamese data for bill OCR
+RUN apt-get update && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-vie \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
 RUN pip install -r requirements.txt && useradd --uid 10001 --no-create-home app && mkdir -m 755 /models
 
